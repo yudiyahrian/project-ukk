@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,12 +18,12 @@ model User {
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
   accounts      Account[]
-  sessions      Session[]
-  Photo         Photo[]
+  Album         Album[]
+  CommentLike   CommentLike[]
   Comment       Comment[]
   PhotoLike     PhotoLike[]
-  CommentLike   CommentLike[]
-  Album         Album[]
+  Photo         Photo[]
+  sessions      Session[]
 
   @@map("users")
 }
@@ -48,6 +45,7 @@ model Account {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId], map: "accounts_user_id_fkey")
   @@map("accounts")
 }
 
@@ -57,22 +55,12 @@ model Session {
   sessionToken String   @unique @map("session_token")
   accessToken  String?  @map("access_token") @db.Text
   expires      DateTime
-  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "sessions_user_id_fkey")
   @@map("sessions")
-}
-
-model VerificationRequest {
-  id         String   @id @default(cuid())
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  @@unique([identifier, token])
 }
 
 model Album {
@@ -81,81 +69,87 @@ model Album {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos    Photo[]
 
-  // Establishing the relationship with the User table
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Relationship with Photo table
-  photos Photo[]
-
+  @@index([userId], map: "albums_user_id_fkey")
   @@map("albums")
 }
 
-// Update the Photo model to include the Album relationship
 model Photo {
-  id           String      @id @default(cuid())
-  userId       String?     @map("user_id")
-  albumId      String?     @map("album_id") // Foreign Key referencing Albums table
-  sessionToken String      @unique @map("session_token")
-  accessToken  String?     @map("access_token") @db.Text
-  expires      DateTime
-  user         User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  album        Album?      @relation(fields: [albumId], references: [id])
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
-  Comment      Comment[]
-  PhotoLike    PhotoLike[]
+  id          String      @id @default(cuid())
+  description String
+  userId      String?     @map("user_id")
+  albumId     String?     @map("album_id")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  Comment     Comment[]
+  PhotoLike   PhotoLike[]
+  album       Album?      @relation(fields: [albumId], references: [id])
+  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([albumId], map: "photos_album_id_fkey")
+  @@index([userId], map: "photos_user_id_fkey")
   @@map("photos")
 }
 
 model Comment {
-  id              String   @id @default(cuid())
-  photoId         String   @map("photo_id") // Foreign Key referencing Photos table 
-  userId          String   @map("user_id") // Foreign Key referencing Users table
-  parentCommentId String?  @map("parent_comment_id") // Foreign Key referencing Comments table
+  id              String        @id @default(cuid())
+  photoId         String        @map("photo_id")
+  userId          String        @map("user_id")
+  parentCommentId String?       @map("parent_comment_id")
   content         String
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  CommentLike     CommentLike[]
+  parentComment   Comment?      @relation("ChildComments", fields: [parentCommentId], references: [id])
+  childComments   Comment[]     @relation("ChildComments")
+  photo           Photo         @relation(fields: [photoId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
 
-  // Establishing the relationships
-  photo         Photo    @relation(fields: [photoId], references: [id])
-  user          User     @relation(fields: [userId], references: [id])
-  parentComment Comment? @relation("ChildComments", fields: [parentCommentId], references: [id])
-
-  // Establishing the relationship with child comments
-  childComments Comment[]     @relation("ChildComments")
-  CommentLike   CommentLike[]
-
+  @@index([parentCommentId], map: "comments_parent_comment_id_fkey")
+  @@index([photoId], map: "comments_photo_id_fkey")
+  @@index([userId], map: "comments_user_id_fkey")
   @@map("comments")
 }
 
 model PhotoLike {
   id        String   @id @default(cuid())
-  photoId   String   @map("photo_id") // Foreign Key referencing Photos table
-  userId    String   @map("user_id") // Foreign Key referencing Users table
+  photoId   String   @map("photo_id")
+  userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  photo     Photo    @relation(fields: [photoId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-  // Establishing the relationships
-  photo Photo @relation(fields: [photoId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
-
+  @@index([photoId], map: "photo_likes_photo_id_fkey")
+  @@index([userId], map: "photo_likes_user_id_fkey")
   @@map("photo_likes")
 }
 
 model CommentLike {
   id        String   @id @default(cuid())
-  commentId String   @map("comment_id") // Foreign Key referencing Comments table
-  userId    String   @map("user_id") // Foreign Key referencing Users table
+  commentId String   @map("comment_id")
+  userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-  // Establishing the relationships
-  comment Comment @relation(fields: [commentId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
-
+  @@index([commentId], map: "comment_likes_comment_id_fkey")
+  @@index([userId], map: "comment_likes_user_id_fkey")
   @@map("comment_likes")
+}
+
+model verificationrequest {
+  id         String   @id
+  identifier String
+  token      String   @unique(map: "VerificationRequest_token_key")
+  expires    DateTime
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  @@unique([identifier, token], map: "VerificationRequest_identifier_token_key")
 }
 
 enum Role {

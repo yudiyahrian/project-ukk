@@ -10,7 +10,7 @@ export const authOptions: NextAuthOptions = {
   // @see https://github.com/prisma/prisma/issues/16117
   adapter: PrismaAdapter(prisma) as any,
   pages: {
-    signIn: "/login",
+    signIn: "/sign-in",
   },
   session: {
     strategy: "jwt",
@@ -51,6 +51,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          image: user.image,
           randomKey: "Hey cool",
         };
       },
@@ -62,18 +63,26 @@ export const authOptions: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
+          image: token.picture,
           id: token.id,
           randomKey: token.randomKey,
           role: token.role,
         },
       };
     },
-    jwt: ({ token, user }) => {
+    jwt: ({ token, user, trigger, session }) => {
+      if (trigger === "update" && session?.image) {
+        token.picture = session.image;
+      }
+      if (trigger === "update" && session?.name) {
+        token.name = session.name;
+      }
       if (user) {
         const u = user as unknown as any;
         return {
           ...token,
           id: u.id,
+          picture: u.image,
           randomKey: u.randomKey,
           role: u.role,
         };

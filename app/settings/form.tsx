@@ -1,25 +1,34 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { ChangeEvent, useState } from "react";
+import { useSession } from "next-auth/react";
+import { ChangeEvent, useState, useEffect } from "react";
 
-export const RegisterForm = () => {
+export default function ProfileForm() {
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     name: "",
-    email: "",
-    password: "",
+    id: "",
   });
   const [error, setError] = useState("");
+
+  const { data: session, update: UpdateSession } = useSession();
+  const user = session?.user;
+
+  useEffect(() => {
+    if (user) {
+      // Set the initial form values only when user data is available
+      setFormValues({ name: user.name ?? "", id: user.id ?? "" });
+    }
+  }, [user]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setFormValues({ name: "", email: "", password: "" });
+    // setFormValues({ name: "", id: "" });
 
     try {
-      const res = await fetch("/api/register", {
-        method: "POST",
+      const res = await fetch("/api/profile", {
+        method: "PUT",
         body: JSON.stringify(formValues),
         headers: {
           "Content-Type": "application/json",
@@ -27,12 +36,11 @@ export const RegisterForm = () => {
       });
 
       setLoading(false);
+      UpdateSession({ name: formValues.name });
       if (!res.ok) {
         setError((await res.json()).message);
         return;
       }
-
-      signIn(undefined, { callbackUrl: "/" });
     } catch (error: any) {
       setLoading(false);
       setError(error);
@@ -63,36 +71,16 @@ export const RegisterForm = () => {
           className={`${input_style}`}
         />
       </div>
-      <div className="mb-6">
-        <input
-          required
-          type="email"
-          name="email"
-          value={formValues.email}
-          onChange={handleChange}
-          placeholder="Email address"
-          className={`${input_style}`}
-        />
-      </div>
-      <div className="mb-6">
-        <input
-          required
-          type="password"
-          name="password"
-          value={formValues.password}
-          onChange={handleChange}
-          placeholder="Password"
-          className={`${input_style}`}
-        />
-      </div>
+      <p className="mb-3">Email: {user?.email}</p>
+      <p className="mb-3">Role: {user?.role}</p>
       <button
         type="submit"
         style={{ backgroundColor: `${loading ? "#ccc" : "#3446eb"}` }}
         className="inline-block px-7 py-4 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out w-full"
         disabled={loading}
       >
-        {loading ? "loading..." : "Sign Up"}
+        {loading ? "loading..." : "Update"}
       </button>
     </form>
   );
-};
+}

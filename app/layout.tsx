@@ -7,6 +7,7 @@ import { EdgeStoreProvider } from "@utils/edgestore";
 import { Inter } from "next/font/google";
 import { cn } from "@utils/utils";
 import { Toaster } from "@components/ui/Toaster";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: `Project UKK`,
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body className="min-h-screen pt-12 bg-slate-50 antialiased">
         <NextAuthProvider>
           <Navbar />
+          <NextTopLoader showSpinner={false} color="#2299DD" />
           {authModal}
           <div className="container max-w-7xl h-full pt-12">
             <EdgeStoreProvider>{children}</EdgeStoreProvider>

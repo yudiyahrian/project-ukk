@@ -15,7 +15,31 @@ async function main() {
       password,
     },
   });
-  console.log({ user });
+  const default_album_1 = await prisma.album.upsert({
+    where: { id: "default_profile_image_album" },
+    update: {},
+    create: {
+      id: "default_profile_image_album",
+      name: "Profile Image",
+    },
+  });
+  const default_album_2 = await prisma.album.upsert({
+    where: { id: "default_banner_image_album" },
+    update: {},
+    create: {
+      id: "default_banner_image_album",
+      name: "Banner Image",
+    },
+  });
+  const default_album_3 = await prisma.album.upsert({
+    where: { id: "default_saved_image_album" },
+    update: {},
+    create: {
+      id: "default_saved_image_album",
+      name: "Saved Image",
+    },
+  });
+  console.log({ user, default_album_1, default_album_2, default_album_3 });
 }
 main()
   .then(() => prisma.$disconnect())

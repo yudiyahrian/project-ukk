@@ -9,11 +9,13 @@ datasource db {
 
 model User {
   id            String        @id @default(uuid())
-  name          String
+  name          String        @unique
   email         String?       @unique
   password      String?
+  description   String?
   emailVerified DateTime?     @map("email_verified")
   image         String?
+  bannerImage   String?
   role          Role          @default(user)
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
@@ -21,9 +23,12 @@ model User {
   Album         Album[]
   CommentLike   CommentLike[]
   Comment       Comment[]
-  PhotoLike     PhotoLike[]
+  PhotoLike     Like[]
   Photo         Photo[]
   sessions      Session[]
+  Post          Post[]
+  Follower      UserFollow[]
+  FollowedUser  UserFollow[]  @relation("FollowedUser")
 
   @@map("users")
 }
@@ -65,11 +70,11 @@ model Session {
 
 model Album {
   id        String   @id @default(cuid())
-  userId    String   @map("user_id")
+  userId    String?  @map("user_id")
   name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   photos    Photo[]
 
   @@index([userId], map: "albums_user_id_fkey")
@@ -77,25 +82,41 @@ model Album {
 }
 
 model Photo {
-  id          String      @id @default(cuid())
-  description String
-  userId      String?     @map("user_id")
-  albumId     String?     @map("album_id")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+  id          String    @id @default(cuid())
+  photo       String
+  description String?
+  userId      String?   @map("user_id")
+  albumId     String?   @map("album_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   Comment     Comment[]
-  PhotoLike   PhotoLike[]
-  album       Album?      @relation(fields: [albumId], references: [id])
-  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  PhotoLike   Like[]
+  album       Album?    @relation(fields: [albumId], references: [id])
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Post        Post?     @relation(fields: [postId], references: [id])
+  postId      String?
 
   @@index([albumId], map: "photos_album_id_fkey")
   @@index([userId], map: "photos_user_id_fkey")
   @@map("photos")
 }
 
+model Post {
+  id      String    @id @default(cuid())
+  content String?
+  userId  String?   @map("user_id")
+  photos  Photo[]
+  user    User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like    Like[]
+  Comment Comment[]
+
+  @@map("posts")
+}
+
 model Comment {
   id              String        @id @default(cuid())
-  photoId         String        @map("photo_id")
+  photoId         String?       @map("photo_id")
+  postId          String?       @map("post_id")
   userId          String        @map("user_id")
   parentCommentId String?       @map("parent_comment_id")
   content         String
@@ -104,7 +125,8 @@ model Comment {
   CommentLike     CommentLike[]
   parentComment   Comment?      @relation("ChildComments", fields: [parentCommentId], references: [id])
   childComments   Comment[]     @relation("ChildComments")
-  photo           Photo         @relation(fields: [photoId], references: [id])
+  photo           Photo?        @relation(fields: [photoId], references: [id])
+  post            Post?         @relation(fields: [postId], references: [id])
   user            User          @relation(fields: [userId], references: [id])
 
   @@index([parentCommentId], map: "comments_parent_comment_id_fkey")
@@ -113,18 +135,20 @@ model Comment {
   @@map("comments")
 }
 
-model PhotoLike {
+model Like {
   id        String   @id @default(cuid())
-  photoId   String   @map("photo_id")
+  photoId   String?  @map("photo_id")
+  postId    String?  @map("post_id")
   userId    String   @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  photo     Photo    @relation(fields: [photoId], references: [id])
+  photo     Photo?   @relation(fields: [photoId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([photoId], map: "photo_likes_photo_id_fkey")
   @@index([userId], map: "photo_likes_user_id_fkey")
-  @@map("photo_likes")
+  @@map("likes")
 }
 
 model CommentLike {
@@ -150,6 +174,21 @@ model verificationrequest {
   updated_at DateTime
 
   @@unique([identifier, token], map: "VerificationRequest_identifier_token_key")
+}
+
+model UserFollow {
+  id             String   @id @default(cuid())
+  followerId     String   @map("follower_id")
+  followedUserId String   @map("followed_user_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  follower       User     @relation(fields: [followerId], references: [id])
+  followedUser   User     @relation("FollowedUser", fields: [followedUserId], references: [id])
+
+  @@unique([followerId, followedUserId], map: "user_follow_follower_id_followed_user_id_key")
+  @@index([followerId], map: "user_follow_follower_id_index")
+  @@index([followedUserId], map: "user_follow_followed_user_id_index")
+  @@map("user_follows")
 }
 
 enum Role {

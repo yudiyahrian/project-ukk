@@ -5,7 +5,6 @@ import { ChangeEvent, useState } from "react";
 import { z, ZodError, ZodIssue } from "zod";
 import { Input } from "@components/ui/Input";
 import { Button, Label } from "./ui";
-import { useRouter } from "next/navigation";
 
 const schema = z.object({
   email: z.string().email(),
@@ -26,7 +25,6 @@ export default function SignUpForm() {
     password: "",
   });
   const [errors, setErrors] = useState<ValidationError[]>([]);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,15 +42,21 @@ export default function SignUpForm() {
 
       setIsLoading(false);
       if (!res.ok) {
-        setErrors((await res.json()).message);
+        const resJson = await res.json();
+        setErrors([
+          {
+            code: resJson.code,
+            message: resJson.message,
+          },
+        ]);
         return;
+      } else {
+        await signIn("credentials", {
+          email: formValues.email,
+          password: formValues.password,
+          callbackUrl: "/",
+        });
       }
-
-      await signIn("credentials", {
-        email: formValues.email,
-        password: formValues.password,
-        callbackUrl: "/",
-      });
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -78,11 +82,11 @@ export default function SignUpForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4">
-        <Label className="opacity-75">Name</Label>
+        <Label className="opacity-75">Username</Label>
         <Input
           name="name"
           type="text"
-          placeholder="Your name"
+          placeholder="Username"
           value={formValues.name}
           onChange={handleChange}
           className="mt-2"
@@ -137,11 +141,14 @@ export default function SignUpForm() {
   }
 
   function getErrorText(error: ValidationError): string {
+    console.log(error.code);
     switch (error.code) {
       case "invalid_string":
         return "Invalid email";
       case "too_small":
         return "Password must contain at least 6 characters";
+      case "username-has-been-used":
+        return "Username has been used";
       // Add more cases as needed for different error codes
       default:
         return "An error occurred";

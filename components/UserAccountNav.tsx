@@ -29,25 +29,32 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white" align="end">
-        <div className="flex items-center justify-start gap-2 p-2">
-          <div className="flex flex-col space-y-1 leading-none">
-            {user.name && <p className="font-medium">{user.name}</p>}
-            {user.email && (
-              <p className="w-[200px] truncate text-sm text-zinc-700">
-                {user.email}
-              </p>
-            )}
-          </div>
-        </div>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href={`/user/${user.name}`}>
+            <div className="flex items-center justify-start gap-3 p-2">
+              <UserAvatar
+                user={{
+                  name: user.name || null,
+                  image: user.image || null,
+                }}
+                className="h-8 w-8"
+              />
+              <div className="flex flex-col space-y-1 leading-none">
+                <p className="font-medium">View profile</p>
+                {user.name && (
+                  <p className="w-[200px] truncate text-sm text-zinc-700">
+                    {user.name}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Link>
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={"/"}>Feed</Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild className="cursor-pointer">
-          <Link href={"/r/create"}>Create post</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild className="cursor-pointer">

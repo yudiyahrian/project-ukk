@@ -4,6 +4,8 @@ import { buttonVariants } from "./ui";
 import { authOptions } from "@/utils/auth";
 import UserAccountNav from "./UserAccountNav";
 import { getServerSession } from "next-auth";
+import { Button } from "./ui";
+import { Plus } from "lucide-react";
 
 type Props = {};
 
@@ -24,7 +26,13 @@ const Navbar = async (props: Props) => {
         {/* <Searchbar /> */}
 
         {session?.user ? (
-          <UserAccountNav user={session.user} />
+          <div className="flex gap-3">
+            <Button variant="subtle">
+              <Plus className="mr-1 h-7" />
+              Create
+            </Button>
+            <UserAccountNav user={session.user} />
+          </div>
         ) : (
           <Link href={"/sign-in"} className={buttonVariants()}>
             Sign In

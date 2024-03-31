@@ -136,9 +136,6 @@ model Post {
   photos        Photo[]
   user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   likes         Like[]
-  parentPostId  String?
-  parentPost    Post?          @relation("rootPost", fields: [parentPostId], references: [id], onDelete: Cascade)
-  replies       Post[]         @relation("rootPost")
   notification  Notification[]
   Comment       Comment[]
 

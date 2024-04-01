@@ -63,3 +63,12 @@
 .codex-editor__redactor {
   padding-bottom: 0 !important;
 }
+
+.styled-scrollbars {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+  --scrollbar-background: var(
+    --styled-scrollbar-background,
+    var(--shreddit-content-background)
+  );
+}

@@ -18,16 +18,24 @@ const buttonVariants = cva(
         link: "bg-transparent dark:bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent",
       },
       size: {
-        default: "h-10 py-2 px-4 rounded-md",
-        sm: "h-9 px-2 rounded-md",
-        xs: "h-8 px-1.5 rounded-sm",
-        lg: "h-11 px-8 rounded-md",
-        rounded: "h-7 w-7 rounded-full",
+        default: "h-10 py-2 px-4",
+        sm: "h-9 px-2",
+        xs: "h-8 px-1.5",
+        lg: "h-11 px-8",
+        verySmall: "h-7 w-7",
+        customXs: "h-8 px-2",
+      },
+      rounded: {
+        sm: "rounded-sm",
+        md: "rounded-md",
+        xl: "rounded-xl",
+        full: "rounded-full",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      rounded: "md",
     },
   }
 );

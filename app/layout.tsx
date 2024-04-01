@@ -8,6 +8,8 @@ import { Inter } from "next/font/google";
 import { cn } from "@utils/utils";
 import { Toaster } from "@components/ui/Toaster";
 import NextTopLoader from "nextjs-toploader";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@utils/auth";
 
 export const metadata: Metadata = {
   title: `Project UKK`,
@@ -16,13 +18,14 @@ export const metadata: Metadata = {
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   authModal,
 }: {
   children: React.ReactNode;
   authModal: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
   return (
     <html
       lang="en"
@@ -32,7 +35,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-screen pt-12 bg-slate-50 antialiased">
-        <NextAuthProvider>
+        <NextAuthProvider session={session}>
           <Navbar />
           <NextTopLoader showSpinner={false} color="#2299DD" />
           {authModal}

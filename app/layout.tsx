@@ -1,46 +1,33 @@
-import "@styles/globals.css";
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import { Roboto_Flex } from "next/font/google";
+import "./globals.css";
+import localFont from 'next/font/local';
+import Navbar from "@/components/Navbar";
+import ModalProvider from "@/providers/ModalProvider";
+import UserProvider from "@/providers/UserProvider";
 
-import { Navbar } from "@/components";
-import { NextAuthProvider } from "./providers";
-import { EdgeStoreProvider } from "@utils/edgestore";
-import { Inter } from "next/font/google";
-import { cn } from "@utils/utils";
-import { Toaster } from "@components/ui/Toaster";
-import NextTopLoader from "nextjs-toploader";
+const inter = Roboto_Flex({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: `Project UKK`,
-  description: `Membuat website gallery`,
+  title: "Wave",
+  description: "",
 };
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
-  authModal,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-  authModal: React.ReactNode;
-}) {
+}>) {
   return (
-    <html
-      lang="en"
-      className={cn(
-        "bg-white text-slate-900 antialiased light",
-        inter.className
-      )}
-    >
-      <body className="min-h-screen pt-12 bg-slate-50 antialiased">
-        <NextAuthProvider>
-          <Navbar />
-          <NextTopLoader showSpinner={false} color="#2299DD" />
-          {authModal}
-          <div className="container max-w-7xl h-full pt-12">
-            <EdgeStoreProvider>{children}</EdgeStoreProvider>
-          </div>
-          <Toaster />
-        </NextAuthProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        <UserProvider>
+          <ModalProvider>
+            <Navbar>
+              {children}
+            </Navbar>
+          </ModalProvider>
+        </UserProvider>
       </body>
     </html>
   );

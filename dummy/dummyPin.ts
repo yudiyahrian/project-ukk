@@ -1,0 +1,247 @@
+import { Pin } from "@/db_types";
+
+export const dummyPins: Pin[] = [
+  {
+    id: '1',
+    image: 'https://i.pinimg.com/564x/aa/22/9d/aa229dde05694e15f088c172c5759c5f.jpg',
+    title: '',
+    user: {
+      id: '1',
+      name: 'John Thor',
+      username: "johnthor",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 0,
+      following: 0,
+    },
+  },
+  {
+    id: '2',
+    image: 'https://i.pinimg.com/564x/55/2f/d3/552fd3b4aaf7ab8756e1494eb3a505cb.jpg',
+    title: 'afternoon',
+    link: 'https://docs.google.com/forms/d/e/1FAIpQLSfWIYDAUNCuEDGL_yPEinKME4K6nueUnT_c5vwmMqS1Q4-u7A/viewform',
+    user: {
+      id: '2',
+      name: 'Ranpang',
+      username: "janedoe",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: 'https://i.pinimg.com/564x/1a/77/a4/1a77a43e08bb0816fea31575f80dd898.jpg',
+      followers: 20,
+      following: 15,
+    },
+  },
+  {
+    id: '3',
+    image: 'https://i.pinimg.com/564x/9c/a3/29/9ca32982d5548f50cfcc25252abce38e.jpg',
+    title: '',
+    user: {
+      id: '3',
+      name: 'Alice Smith',
+      username: "alicesmith",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 30,
+      following: 25,
+    },
+  },
+  {
+    id: '4',
+    image: 'https://i.pinimg.com/564x/e1/ec/92/e1ec9214f81b3133621c5c43a3fb9757.jpg',
+    title: '',
+    link:'https://tailwindcss.com/docs/responsive-design',
+    user: {
+      id: '4',
+      name: 'Bob Johnson',
+      username: "bobjohnson",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 40,
+      following: 35,
+    },
+  },
+  {
+    id: '5',
+    image: 'https://i.pinimg.com/564x/c5/9f/8c/c59f8c64dfdb6d681fca19a652b9d52d.jpg',
+    title: '',
+    user: {
+      id: '5',
+      name: 'Emily Brown',
+      username: "emilybrown",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 50,
+      following: 45,
+    },
+  },
+  {
+    id: '6',
+    image: 'https://i.pinimg.com/736x/84/02/f3/8402f39d79c6da9814d7efdf9533b9ed.jpg',
+    title: '',
+    user: {
+      id: '1',
+      name: 'John Thor',
+      username: "johnthor",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 0,
+      following: 0,
+    },
+  },
+  {
+    id: '7',
+    image: 'https://i.pinimg.com/564x/0b/47/3c/0b473c264e5339724e5ad62fd3c0d940.jpg',
+    title: '',
+    user: {
+      id: '1',
+      name: 'John Thor',
+      username: "johnthor",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 0,
+      following: 0,
+    },
+  },
+  {
+    id: '8',
+    image: 'https://i.pinimg.com/736x/e7/71/f6/e771f6581c14e35ed4e17fc81bf9312e.jpg',
+    title: '',
+    user: {
+      id: '1',
+      name: 'John Thor',
+      username: "johnthor",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 0,
+      following: 0,
+    },
+  },
+  {
+    id: '9',
+    image: 'https://i.pinimg.com/564x/23/15/1e/23151e7f89de4f79b773abf2e648b3c2.jpg',
+    title: '',
+    user: {
+      id: '1',
+      name: 'John Thor',
+      username: "johnthor",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 0,
+      following: 0,
+    },
+  },
+  {
+    id: '10',
+    image: 'https://i.pinimg.com/564x/2e/39/fd/2e39fda15778738e2c49891ed159c8d8.jpg',
+    title: '',
+    user: {
+      id: '1',
+      name: 'John Thor',
+      username: "johnthor",
+      email: "johnthor@gmail.com",
+      password: "password",
+      token: '',
+      avatar: '/default_avatar.png',
+      followers: 0,
+      following: 0,
+    },
+  },
+]
+
+const dummyAlbums = [
+  {
+    id: '1',
+    name: 'rndm',
+    description: '',
+    photos: [
+      {
+        id: '12',
+        image: 'https://',
+        title: '',
+        description: '',
+        userId: "1",
+        user: {
+          id: '1',
+          name: 'n',
+        },
+      },
+      {
+        id: '21',
+        image: 'https://',
+        title: '',
+        description: '',
+        userId: "1",
+        user: {
+          id: '1',
+          name: 'n',
+        },
+      },
+    ]
+  },
+  {
+    id: '2',
+    name: 'mrm',
+    userId: '1',
+    user: {
+      id: '1',
+      name: 'n',
+      
+    },
+    description: '',
+    photos: [
+      {
+        id: '12',
+        image: 'https://',
+        title: '',
+        description: '',
+        userId: "1",
+        user: {
+          id: '1',
+          name: 'n',
+          
+        },
+      },
+      {
+        id: '1112',
+        image: 'https://',
+        title: '',
+        description: '',
+        userId: "1",
+        user: {
+          id: '1',
+          name: 'n',
+          
+        },
+      },
+      {
+        id: '62',
+        image: 'https://',
+        title: '',
+        description: '',
+        userId: "1",
+        user: {
+          id: '1',
+          name: 'n',
+          
+        },
+      },
+    ]
+  },
+]

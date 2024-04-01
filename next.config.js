@@ -1,17 +1,15 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
       },
       {
-        protocol: "https",
-        hostname: "files.edgestore.dev",
+        protocol: 'https',
+        hostname: 'id.pinterest.com/',
       },
     ],
+    // domains: ['i.pinimg.com']
   },
-};
-
-module.exports = nextConfig;
+}

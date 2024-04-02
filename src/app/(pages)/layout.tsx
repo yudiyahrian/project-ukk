@@ -1,33 +1,26 @@
-import MobileNavbar from "@/components/layouts/mobile-navbar";
-import SiteHeader from "@/components/layouts/site-header";
-import { getUserEmail } from "@/lib/utils";
-import { db } from "@/server/db";
-import { currentUser } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
+import "../globals.css";
+import type { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import CustomProvider from "../providers";
+import BaseComponent from "@/components/base/BaseComponent";
 
-interface PagesLayoutProps {
+export const metadata: Metadata = {
+  title: "Threads App",
+  description: "The Threads app to share your thoughts and much more.",
+};
+
+export default function RootLayout({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-export default async function PagesLayout({ children }: PagesLayoutProps) {
-  const user = await currentUser();
-
-  if (!user) redirect("/login");
-
-  const dbUser = await db.user.findUnique({
-    where: {
-      id: user?.id,
-      email: getUserEmail(user),
-    },
-  });
-
-  if (!dbUser) redirect("/account?origin=/");
-
+}) {
   return (
-    <>
-      <SiteHeader />
-      <main className="container max-w-[620px] px-4 sm:px-6">{children}</main>
-      <MobileNavbar />
-    </>
+    <CustomProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <BaseComponent>{children}</BaseComponent>
+        <Toaster />
+      </ThemeProvider>
+    </CustomProvider>
   );
 }

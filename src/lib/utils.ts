@@ -57,8 +57,16 @@ export function catchClerkError(err: unknown) {
   }
 }
 
+export function bytesToMB(bytes: number): number {
+  const MB = 1048576;
+  return bytes / MB;
+}
 
-export function formatTimeAgo(timestamp: Date): string {
+export function getRandomNumber(min: number, max: number): string {
+  return Math.floor(Math.random() * (max - min + 1) + min).toString();
+}
+
+export function formateDate(timestamp: Date): string {
   const now = new Date();
   const secondsDiff = differenceInSeconds(now, timestamp);
   const minutesDiff = differenceInMinutes(now, timestamp);
@@ -79,6 +87,10 @@ export function formatTimeAgo(timestamp: Date): string {
   }
 }
 
+export async function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function truncateText(text: string, maxLength: number) {
   if (text.length > maxLength) {
     return text.slice(0, maxLength) + "...";
@@ -86,4 +98,3 @@ export function truncateText(text: string, maxLength: number) {
     return text;
   }
 }
-

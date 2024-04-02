@@ -19,13 +19,13 @@ model User {
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
   accounts        Account[]
-  Album           Album[]
-  CommentLike     CommentLike[]
-  Comment         Comment[]
-  PhotoLike       Like[]
-  Photo           Photo[]
+  albums          Album[]
+  commentLikes    CommentLike[]
+  comments        Comment[]
+  photoLikes      Like[]
+  photos          Photo[]
   sessions        Session[]
-  Post            Post[]
+  posts           Post[]
   Follower        UserFollow[]
   FollowedUser    UserFollow[]  @relation("FollowedUser")
   senderNotifications   Notification[] @relation("sender")
@@ -35,22 +35,22 @@ model User {
 }
 
 model Notification {
-  id              String           @id @default(cuid())
-  createdAt       DateTime         @default(now())
-  read            Boolean          @default(false)
-  type            NotificationType
-  message         String
-  isPublic        Boolean          @default(false)
+    id        String           @id @default(cuid())
+    createdAt DateTime         @default(now())
+    read      Boolean          @default(false)
+    type      NotificationType
+    message   String
+    isPublic  Boolean          @default(false)
 
-  senderUserId    String
-  receiverUserId  String?
-  senderUser      User    @relation("sender", fields: [senderUserId], references: [id], onDelete: Cascade)
-  receiverUser    User?   @relation("receiver", fields: [receiverUserId], references: [id], onDelete: Cascade)
+    senderUserId   String
+    receiverUserId String?
+    senderUser     User    @relation("sender", fields: [senderUserId], references: [id], onDelete: Cascade)
+    receiverUser   User?   @relation("receiver", fields: [receiverUserId], references: [id], onDelete: Cascade)
 
-  postId          String?
-  post            Post?   @relation(fields: [postId], references: [id])
+    postId String?
+    post   Post?   @relation(fields: [postId], references: [id])
 
-  @@index([receiverUserId])
+    @@index([receiverUserId])
 }
 
 enum NotificationType {
@@ -132,12 +132,14 @@ model Post {
   id            String    @id @default(cuid())
   createdAt     DateTime       @default(now())
   text          String?
-  userId        String?   @map("user_id")
-  photos        Photo[]
-  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes         Like[]
+  images        Photo[]
+  author        User?     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String?   @map("user_id")
   notification  Notification[]
-  Comment       Comment[]
+  likes         Like[]
+  comments      Comment[]
+  comment_count Int       @default(0)
+  like_count    Int       @default(0)
 
   @@map("posts")
   @@unique([createdAt, id])
@@ -146,18 +148,18 @@ model Post {
 model Comment {
   id              String        @id @default(cuid())
   photoId         String?       @map("photo_id")
-  postId          String?       @map("post_id")
-  userId          String        @map("user_id")
   parentCommentId String?       @map("parent_comment_id")
   content         String
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
-  CommentLike     CommentLike[]
+  commentLikes    CommentLike[]
   parentComment   Comment?      @relation("ChildComments", fields: [parentCommentId], references: [id])
   childComments   Comment[]     @relation("ChildComments")
   photo           Photo?        @relation(fields: [photoId], references: [id])
   post            Post?         @relation(fields: [postId], references: [id])
+  postId          String?       @map("post_id")
   user            User          @relation(fields: [userId], references: [id])
+  userId          String        @map("user_id")
 
   @@index([parentCommentId], map: "comments_parent_comment_id_fkey")
   @@index([photoId], map: "comments_photo_id_fkey")

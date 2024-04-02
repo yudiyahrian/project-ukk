@@ -1,24 +1,30 @@
+// Import CSS global styles
 import "@/styles/globals.css";
 
+// Import Next.js modules
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
-import { TRPCReactProvider } from "@/trpc/react";
+import { ClerkProvider } from "@clerk/nextjs";
+
+// Import React modules
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Suspense } from "react";
 import FullscreenImageView from "@/components/fullscreen-image-view";
 import Loading from "@/app/(pages)/loading";
-import { siteConfig } from "@/config/site";
-import type { Metadata, Viewport } from "next";
 
+// Import site configuration
+import { siteConfig } from "@/config/site";
+
+// Define font
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://threads.codebustar.com'),
+// Define metadata for the site
+export const metadata = {
+  metadataBase: new URL("https://threads.codebustar.com"),
   title: {
     default: siteConfig.name,
     template: `%s • ${siteConfig.name}`,
@@ -27,18 +33,15 @@ export const metadata: Metadata = {
   keywords: [
     "nextjs",
     "prisma",
-    "tRPC",
-    "sujjeee",
-    "threads",
-    "threads-clone",
+    "wave",
     "t3-stack",
     "uploadthing",
-    "shadcn ui"
+    "shadcn ui",
   ],
   authors: [
     {
-      name: "sujjeee",
-      url: "https://x.com/sujjeeee",
+      name: "admin",
+      url: "https://x.com",
     },
   ],
   creator: "sujjeee",
@@ -55,44 +58,40 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
-    creator: "@sujjeeee",
+    creator: "admin",
   },
   icons: {
     icon: "/favicon.ico",
   },
-}
+};
 
-export const viewport: Viewport = {
+// Define viewport settings
+export const viewport = {
   colorScheme: "dark light",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
     { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
-}
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Define RootLayout component
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
       <html lang="en">
         <body className={`font-sans no-scrollbar ${inter.variable}`}>
-          <TRPCReactProvider headers={headers()}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster />
-              <Suspense fallback={<Loading />}>
-                <FullscreenImageView />
-              </Suspense>
-            </ThemeProvider>
-          </TRPCReactProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster />
+            <Suspense fallback={<Loading />}>
+              <FullscreenImageView />
+            </Suspense>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -1,15 +1,19 @@
-import { PostFeed } from "@components/PostFeed";
+import GeneralFeed from "@components/GeneralFeed";
+import PostFeed from "@components/PostFeed";
 import { buttonVariants } from "@components/ui";
 import { HomeIcon } from "lucide-react";
+import { getSession } from "next-auth/react";
 import Link from "next/link";
 
-const Home = () => {
+const Home = async () => {
+  const session = await getSession();
   return (
     <>
       <h1 className="font-bold text-3xl md:text-4xl">Your feed</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6">
         {/* {session ? <CustomFeed /> : <GeneralFeed />} */}
-        <PostFeed />
+        {/* <PostFeed /> */}
+        <GeneralFeed />
 
         {/* subreddit info */}
         <div className="overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">
@@ -24,7 +28,7 @@ const Home = () => {
             <div className="flex justify-between gap-x-4 py-3">
               <p className="text-zinc-500">
                 Your personal Breadit homepage. Come here to check in with your
-                favorite communities.
+                favorite posts.
               </p>
             </div>
 
@@ -32,7 +36,7 @@ const Home = () => {
               className={buttonVariants({
                 className: "w-full mt-4 mb-6",
               })}
-              href="/"
+              href="/create"
             >
               Create Post
             </Link>

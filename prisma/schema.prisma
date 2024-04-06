@@ -82,19 +82,19 @@ model Album {
 }
 
 model Photo {
-  id          String    @id @default(cuid())
-  photo       String
-  description String?
-  userId      String?   @map("user_id")
-  albumId     String?   @map("album_id")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  Comment     Comment[]
-  PhotoLike   Like[]
-  album       Album?    @relation(fields: [albumId], references: [id])
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Post        Post?     @relation(fields: [postId], references: [id])
-  postId      String?
+  id        String    @id @default(cuid())
+  photo     String
+  caption   String?
+  userId    String?   @map("user_id")
+  albumId   String?   @map("album_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  Comment   Comment[]
+  PhotoLike Like[]
+  album     Album?    @relation(fields: [albumId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Post      Post?     @relation(fields: [postId], references: [id])
+  postId    String?
 
   @@index([albumId], map: "photos_album_id_fkey")
   @@index([userId], map: "photos_user_id_fkey")
@@ -102,13 +102,16 @@ model Photo {
 }
 
 model Post {
-  id      String    @id @default(cuid())
-  content String?
-  userId  String?   @map("user_id")
-  photos  Photo[]
-  user    User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Like    Like[]
-  Comment Comment[]
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  userId      String    @map("user_id")
+  photos      Photo[]
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like        Like[]
+  Comment     Comment[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   @@map("posts")
 }

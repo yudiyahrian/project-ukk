@@ -1,16 +1,15 @@
 import Link from "next/link";
 import Icons from "./Icons";
 import { buttonVariants } from "./ui";
-import { authOptions } from "@/utils/auth";
+import { getAuthSession } from "@/utils/auth";
 import UserAccountNav from "./UserAccountNav";
-import { getServerSession } from "next-auth";
 import { Button } from "./ui";
 import { Plus } from "lucide-react";
 
 type Props = {};
 
 const Navbar = async (props: Props) => {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   return (
     <div className="fixed top-0 inset-x-0 h-16 bg-zinc-100 border-b border-zinc-300 z-10 py-2">

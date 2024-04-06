@@ -30,8 +30,8 @@ export async function POST(req: Request) {
       // console.log(error);
       return new NextResponse(
         JSON.stringify({
-          code: "username-has-been-used",
-          message: error.message,
+          code: "Username has been taken",
+          message: "Username has been taken, please try again",
         }),
         { status: 500 }
       );
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     return new NextResponse(
       JSON.stringify({
         status: "error",
-        message: error.message,
+        message: "Unexpected error",
       }),
       { status: 500 }
     );

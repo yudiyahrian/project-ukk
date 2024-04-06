@@ -1,6 +1,6 @@
 import { Empty } from "@components/user/Empty";
 
-const Overview = () => {
+const Posts = () => {
   return (
     <>
       <Empty title="posted" isSelf={false} />
@@ -8,4 +8,4 @@ const Overview = () => {
   );
 };
 
-export default Overview;
+export default Posts;

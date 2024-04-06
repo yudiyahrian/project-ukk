@@ -1,45 +1,101 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FC, useEffect, useRef, useState } from "react";
+
+export const allTabs = [
+  {
+    id: "overview",
+    name: "Overview",
+    url: "",
+    selfOnly: false,
+  },
+  {
+    id: "posts",
+    name: "Posts",
+    url: "posts",
+    selfOnly: false,
+  },
+  {
+    id: "liked",
+    name: "Liked",
+    url: "liked",
+
+    selfOnly: true,
+  },
+  {
+    id: "comments",
+    name: "Comments",
+    url: "comments",
+
+    selfOnly: false,
+  },
+  {
+    id: "saved",
+    name: "Saved",
+    url: "saved",
+
+    selfOnly: true,
+  },
+  {
+    id: "albums",
+    name: "Albums",
+    url: "albums",
+
+    selfOnly: true,
+  },
+];
 
 type Tab = {
   id: string;
   name: string;
-  element: React.ReactNode;
+  url: string;
   selfOnly: boolean;
 };
 
 type TabsProps = {
   tabs: Tab[];
-  onTabClick: (element: React.ReactNode) => void; // Callback function to handle tab clicks
+  name: string;
   isSelf: boolean;
 };
 
-export const Tabs: React.FC<TabsProps> = ({ tabs, onTabClick, isSelf }) => {
+export const Tabs: FC<TabsProps> = ({ tabs, isSelf, name }) => {
+  const pathname = usePathname();
   const tabsRef = useRef<(HTMLElement | null)[]>([]);
   const [activeTabIndex, setActiveTabIndex] = useState<number | null>(null);
   const [tabUnderlineWidth, setTabUnderlineWidth] = useState(0);
   const [tabUnderlineLeft, setTabUnderlineLeft] = useState(0);
 
-  useEffect(() => {
-    if (activeTabIndex === null) {
-      setActiveTabIndex(0);
-      return;
-    }
+  const setTabPosition = () => {
+    const currentTab = tabsRef.current[activeTabIndex ?? 0] as HTMLElement;
 
-    const setTabPosition = () => {
-      const currentTab = tabsRef.current[activeTabIndex] as HTMLElement;
-      setTabUnderlineLeft(currentTab?.offsetLeft ?? 0);
-      setTabUnderlineWidth(currentTab?.clientWidth ?? 0);
-    };
-
-    setTabPosition();
-  }, [activeTabIndex]);
-
-  const handleTabClick = (index: number, element: React.ReactNode) => {
-    setActiveTabIndex(index);
-    onTabClick(element); // Call the callback function with the clicked element
+    setTabUnderlineLeft(currentTab?.offsetLeft ?? 0);
+    setTabUnderlineWidth(currentTab?.clientWidth ?? 0);
   };
+
+  useEffect(() => {
+    const parts = pathname.split("/");
+    const url = parts[parts.length - 1];
+    const activeIndex = tabs.findIndex((tab) => tab.url === url);
+    if (activeTabIndex === null) {
+      setActiveTabIndex(activeIndex !== -1 ? activeIndex : 0);
+      return;
+    } else if (activeIndex !== activeTabIndex) {
+      setActiveTabIndex(activeIndex !== -1 ? activeIndex : 0);
+    }
+    const activeTab = tabsRef.current[activeIndex !== -1 ? activeIndex : 0];
+    if (
+      activeTab &&
+      tabs[activeIndex !== -1 ? activeIndex : 0].name === activeTab.innerText
+    ) {
+      setTabPosition();
+    } else {
+      setTimeout(() => {
+        setTabPosition();
+      }, 1000);
+    }
+  }, [activeTabIndex, pathname]);
 
   return (
     <div
@@ -61,16 +117,16 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, onTabClick, isSelf }) => {
           const isActive = activeTabIndex === index;
 
           return (
-            <button
+            <Link
               key={index}
               ref={(el) => (tabsRef.current[index] = el)}
               className={`${
                 isActive ? `` : `hover:underline`
               } my-auto cursor-pointer select-none rounded-full px-4 text-center text-[#0f1a1c]`}
-              onClick={() => handleTabClick(index, tab.element)} // Pass the tab id to the click handler
+              href={`/user/${name}/${tab.url}`}
             >
               {tab.name}
-            </button>
+            </Link>
           );
         })}
     </div>

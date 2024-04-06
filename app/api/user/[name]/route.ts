@@ -1,4 +1,5 @@
 import { prisma } from "@/utils/prisma";
+import { getAuthSession } from "@utils/auth";
 import { prismaExclude } from "@utils/prisma_function";
 import { NextResponse } from "next/server";
 

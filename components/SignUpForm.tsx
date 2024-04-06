@@ -1,116 +1,157 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { ChangeEvent, useState } from "react";
-import { z, ZodError, ZodIssue } from "zod";
+import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
 import { Input } from "@components/ui/Input";
 import { Button, Label } from "./ui";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
 
 const schema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "Username must be longer than 3 characters" }),
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z
+    .string()
+    .min(6, { message: "Password must be longer than 6 characters" }),
 });
 
-interface ValidationError {
-  validation?: string | number;
-  code: string;
-  message: string;
-}
+type UserSignUp = z.infer<typeof schema>;
 
 export default function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [formValues, setFormValues] = useState({
-    name: "",
-    email: "",
-    password: "",
+  const _usernameRef = useRef<HTMLInputElement>(null);
+  const _emailRef = useRef<HTMLInputElement>(null);
+  const _passwordRef = useRef<HTMLInputElement>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserSignUp>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
   });
-  const [errors, setErrors] = useState<ValidationError[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (Object.keys(errors).length) {
+      for (const [_key, value] of Object.entries(errors)) {
+        toast({
+          title: "Something went wrong",
+          description: (value as { message: string }).message,
+          variant: "destructive",
+        });
+      }
+    }
+  }, [errors]);
 
-    try {
+  const { mutate: signUpFn } = useMutation({
+    mutationFn: async ({ name, email, password }: UserSignUp) => {
+      const payload: UserSignUp = {
+        name,
+        email,
+        password,
+      };
       setIsLoading(true);
-      schema.parse(formValues);
       const res = await fetch("/api/sign-up", {
         method: "POST",
-        body: JSON.stringify(formValues),
+        body: JSON.stringify(payload),
         headers: {
           "Content-Type": "application/json",
         },
       });
-
       setIsLoading(false);
       if (!res.ok) {
         const resJson = await res.json();
-        setErrors([
-          {
-            code: resJson.code,
-            message: resJson.message,
-          },
-        ]);
-        return;
+        return toast({
+          title: resJson.code,
+          description: resJson.message,
+          variant: "destructive",
+        });
       } else {
         await signIn("credentials", {
-          email: formValues.email,
-          password: formValues.password,
+          email: email,
+          password: password,
           callbackUrl: "/",
         });
+        return toast({
+          description: "You're successfully sign up, signing in...",
+        });
       }
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      if (error instanceof ZodError) {
-        const validationErrors = error.issues.map(
-          convertZodIssueToValidationError
-        );
-        setErrors(validationErrors);
-      } else {
-        // For unexpected errors
-        setErrors([
-          { code: "unexpected_error", message: "An unexpected error occurred" },
-        ]);
-      }
-    }
+    },
+    onError: () => {
+      return toast({
+        title: "Something went wrong.",
+        description: "Your sign up has an error, please try again later.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = async (data: UserSignUp) => {
+    const payload: UserSignUp = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
+
+    signUpFn(payload);
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormValues({ ...formValues, [name]: value });
-  };
+  const { ref: usernameRef, ...usernameRest } = register("name");
+  const { ref: emailRef, ...emailRest } = register("email");
+  const { ref: passwordRef, ...passwordRest } = register("password");
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
         <Label className="opacity-75">Username</Label>
         <Input
-          name="name"
+          ref={(e) => {
+            usernameRef(e);
+
+            // @ts-ignore
+            _usernameRef.current = e;
+          }}
+          {...usernameRest}
           type="text"
           placeholder="Username"
-          value={formValues.name}
-          onChange={handleChange}
           className="mt-2"
         />
       </div>
       <div className="mb-4">
         <Label className="opacity-75">Email</Label>
         <Input
-          name="email"
-          type="email"
-          placeholder="Your email address"
-          value={formValues.email}
-          onChange={handleChange}
+          ref={(e) => {
+            emailRef(e);
+
+            // @ts-ignore
+            _emailRef.current = e;
+          }}
+          {...emailRest}
           className="mt-2"
+          placeholder="Your email address"
         />
       </div>
       <div className="mb-5">
         <Label className="opacity-75">Password</Label>
         <Input
-          name="password"
+          ref={(e) => {
+            passwordRef(e);
+
+            // @ts-ignore
+            _passwordRef.current = e;
+          }}
+          {...passwordRest}
           type="password"
           placeholder="Your password"
-          value={formValues.password}
-          onChange={handleChange}
           className="mt-2"
         />
       </div>
@@ -122,36 +163,6 @@ export default function SignUpForm() {
       >
         {isLoading ? null : <h4>Sign In</h4>}
       </Button>
-      {errors.length > 0 && (
-        <ul className="mt-4">
-          {errors.map((error, index) => (
-            <li key={index}>{getErrorText(error)}</li>
-          ))}
-        </ul>
-      )}
     </form>
   );
-
-  function convertZodIssueToValidationError(issue: ZodIssue): ValidationError {
-    return {
-      validation: issue.path[0],
-      code: issue.code,
-      message: issue.message,
-    };
-  }
-
-  function getErrorText(error: ValidationError): string {
-    console.log(error.code);
-    switch (error.code) {
-      case "invalid_string":
-        return "Invalid email";
-      case "too_small":
-        return "Password must contain at least 6 characters";
-      case "username-has-been-used":
-        return "Username has been used";
-      // Add more cases as needed for different error codes
-      default:
-        return "An error occurred";
-    }
-  }
 }

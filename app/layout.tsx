@@ -8,8 +8,7 @@ import { Inter } from "next/font/google";
 import { cn } from "@utils/utils";
 import { Toaster } from "@components/ui/Toaster";
 import NextTopLoader from "nextjs-toploader";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@utils/auth";
+import { getAuthSession } from "@utils/auth";
 
 export const metadata: Metadata = {
   title: `Project UKK`,
@@ -25,7 +24,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   authModal: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
   return (
     <html
       lang="en"

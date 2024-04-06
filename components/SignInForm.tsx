@@ -1,99 +1,126 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { z, ZodError, ZodIssue } from "zod";
 import { Input } from "@components/ui/Input";
 import { Button, Label } from "./ui";
 import { useRouter } from "next/navigation";
+import { toast } from "@hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
 
-interface ValidationError {
-  validation?: string | number;
-  code: string;
-  message: string;
-}
+type UserSignIn = z.infer<typeof schema>;
 
 export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [formValues, setFormValues] = useState({
-    email: "",
-    password: "",
+  const _emailRef = useRef<HTMLInputElement>(null);
+  const _passwordRef = useRef<HTMLInputElement>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserSignIn>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
-  const [errors, setErrors] = useState<ValidationError[]>([]);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (Object.keys(errors).length) {
+      for (const [_key, value] of Object.entries(errors)) {
+        toast({
+          title: "Something went wrong",
+          description: (value as { message: string }).message,
+          variant: "destructive",
+        });
+      }
+    }
+  }, [errors]);
 
-    try {
+  const { mutate: signInFn } = useMutation({
+    mutationFn: async ({ email, password }: UserSignIn) => {
       setIsLoading(true);
-      schema.parse(formValues);
       const res = await signIn("credentials", {
         redirect: false,
-        email: formValues.email,
-        password: formValues.password,
+        email: email,
+        password: password,
         callbackUrl: "/",
       });
       setIsLoading(false);
-      if (!res?.error) {
-        setErrors([]);
-        router.refresh();
+      if (!res?.ok) {
+        return toast({
+          title: "Something went wrong.",
+          description:
+            "Invalid email or password, please insert correct credentials",
+          variant: "destructive",
+        });
+      } else {
         router.back();
-      } else {
-        setErrors([
-          {
-            code: "Invalid",
-            message: "Invalid email or password",
-          },
-        ]);
+        router.refresh();
+        return toast({
+          description: "You're successfully sign in, now redirecting..",
+        });
       }
-    } catch (error) {
-      setIsLoading(false);
-      if (error instanceof ZodError) {
-        const validationErrors = error.issues.map(
-          convertZodIssueToValidationError
-        );
-        setErrors(validationErrors);
-      } else {
-        // For unexpected errors
-        setErrors([
-          { code: "unexpected_error", message: "An unexpected error occurred" },
-        ]);
-      }
-    }
+    },
+    onError: () => {
+      return toast({
+        title: "Something went wrong.",
+        description: "Your sign in has an error, please try again later.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = async (data: UserSignIn) => {
+    const payload: UserSignIn = {
+      email: data.email,
+      password: data.password,
+    };
+
+    signInFn(payload);
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormValues({ ...formValues, [name]: value });
-  };
+  const { ref: emailRef, ...emailRest } = register("email");
+  const { ref: passwordRef, ...passwordRest } = register("password");
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
         <Label className="opacity-75">Email</Label>
         <Input
-          name="email"
-          type="email"
+          ref={(e) => {
+            emailRef(e);
+
+            // @ts-ignore
+            _emailRef.current = e;
+          }}
+          {...emailRest}
           placeholder="Your email address"
-          value={formValues.email}
-          onChange={handleChange}
           className="mt-2"
         />
       </div>
       <div className="mb-5">
         <Label className="opacity-75">Password</Label>
         <Input
-          name="password"
+          ref={(e) => {
+            passwordRef(e);
+
+            // @ts-ignore
+            _passwordRef.current = e;
+          }}
+          {...passwordRest}
           type="password"
           placeholder="Your password"
-          value={formValues.password}
-          onChange={handleChange}
           className="mt-2"
         />
       </div>
@@ -105,33 +132,6 @@ export default function SignInForm() {
       >
         {isLoading ? null : <h4>Sign In</h4>}
       </Button>
-      {errors.length > 0 && (
-        <ul className="mt-4">
-          {errors.map((error, index) => (
-            <li key={index}>{getErrorText(error)}</li>
-          ))}
-        </ul>
-      )}
     </form>
   );
-
-  function convertZodIssueToValidationError(issue: ZodIssue): ValidationError {
-    return {
-      validation: issue.path[0],
-      code: issue.code,
-      message: issue.message,
-    };
-  }
-
-  function getErrorText(error: ValidationError): string {
-    switch (error.code) {
-      case "invalid_string":
-        return "Invalid email";
-      case "too_small":
-        return "Password must contain at least 6 characters";
-      // Add more cases as needed for different error codes
-      default:
-        return "Invalid credential";
-    }
-  }
 }

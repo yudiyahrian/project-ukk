@@ -18,10 +18,10 @@ const NotFound = () => {
         />
       </div>
       <h1 className="leading-7 text-2xl font-bold m-0">
-        Sorry, page was not found
+        Sorry, nobody on Breadit goes by that name.
       </h1>
       <p className="my-4 text-sm text-[#576f76] font-semibold">
-        Please go back to home page
+        This account may have been banned or the username is incorrect.
       </p>
       <Link
         aria-label="Edit profile avatar"

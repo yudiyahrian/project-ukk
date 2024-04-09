@@ -7,17 +7,56 @@ import { format } from "date-fns";
 import { notFound } from "next/navigation";
 import { getAuthSession } from "@utils/auth";
 import { User } from "@prisma/client";
+import UserFollowButton from "@components/user/UserFollowButton";
+import { prisma } from "@utils/prisma";
+import { prismaExclude } from "@utils/prisma_function";
 
 const getUser = async (name: string) => {
-  const response = await fetch(process.env.URL + `/api/user/${name}`, {
-    method: "GET",
-    next: { revalidate: 0 },
+  const session = await getAuthSession();
+
+  const formattedUrl = decodeURIComponent(name);
+
+  const user = await prisma.user.findUnique({
+    where: {
+      name: formattedUrl,
+    },
+    select: prismaExclude("User", ["password", "role", "emailVerified"]),
   });
-  if (!response.ok) {
-    return notFound();
-  }
-  const result = await response.json();
-  return result;
+  if (!user) return notFound();
+
+  const isSelf = session?.user.id === user.id;
+
+  const userFollow = await prisma.userFollow.findFirst({
+    where: {
+      followerId: session?.user.id,
+      followedUserId: user.id,
+    },
+  });
+
+  const followersCount = await prisma.userFollow.count({
+    where: {
+      followedUserId: user.id,
+    },
+  });
+  const followedCount = await prisma.userFollow.count({
+    where: {
+      followerId: user.id,
+    },
+  });
+  const postsCount = await prisma.post.count({
+    where: {
+      userId: user.id,
+    },
+  });
+
+  return {
+    user,
+    isSelf,
+    userFollow,
+    followersCount,
+    followedCount,
+    postsCount,
+  };
 };
 
 export default async function Layout({
@@ -27,9 +66,12 @@ export default async function Layout({
   children: React.ReactNode;
   params: { name: string };
 }) {
-  const session = await getAuthSession();
-  const userData: User = await getUser(params.name);
-  const isSelf = session?.user.id === userData.id;
+  const data = await getUser(params.name);
+
+  const userData = data.user;
+  const isSelf: boolean = data.isSelf;
+
+  const followed = !!data.userFollow;
 
   return (
     <div>
@@ -163,10 +205,20 @@ export default async function Layout({
                     {userData.name}
                   </h2>
                 </div>
+                {isSelf ||
+                  (isSelf === false && (
+                    <UserFollowButton
+                      userId={userData.id}
+                      initialFollow={followed}
+                    />
+                  ))}
+
                 <div className="grid gap-y-6 grid-cols-2 my-4">
                   <div className="flex flex-col min-w-0">
                     <p className="m-0 text-sm text-[#0f1a1c] font-semibold whitespace-nowrap">
-                      <span className="font-semibold text-sm">0</span>
+                      <span className="font-semibold text-sm">
+                        {data.followersCount}
+                      </span>
                     </p>
                     <p className="m-0 text-[#576f76] text-xs whitespace-nowrap truncate">
                       Followers
@@ -174,7 +226,9 @@ export default async function Layout({
                   </div>
                   <div className="flex flex-col min-w-0">
                     <p className="m-0 text-sm text-[#0f1a1c] font-semibold whitespace-nowrap">
-                      <span className="font-semibold text-sm">0</span>
+                      <span className="font-semibold text-sm">
+                        {data.followedCount}
+                      </span>
                     </p>
                     <p className="m-0 text-[#576f76] text-xs whitespace-nowrap truncate">
                       Followed
@@ -182,7 +236,9 @@ export default async function Layout({
                   </div>
                   <div className="flex flex-col min-w-0">
                     <p className="m-0 text-sm text-[#0f1a1c] font-semibold whitespace-nowrap">
-                      <span className="font-semibold text-sm">0</span>
+                      <span className="font-semibold text-sm">
+                        {data.postsCount}
+                      </span>
                     </p>
                     <p className="m-0 text-[#576f76] text-xs whitespace-nowrap truncate">
                       Posts

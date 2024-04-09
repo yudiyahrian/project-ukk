@@ -68,9 +68,9 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts }) => {
             <li key={post.id} ref={ref}>
               <PostComponent
                 post={post}
-                LikesAmount={likesAmount}
+                likesAmount={likesAmount}
                 commentAmount={commentsAmount}
-                currentLike={currentLike}
+                currentLike={currentLike?.liked}
               />
             </li>
           );
@@ -80,9 +80,9 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts }) => {
           <PostComponent
             key={post.id}
             post={post}
-            LikesAmount={likesAmount}
+            likesAmount={likesAmount}
             commentAmount={commentsAmount}
-            currentLike={currentLike}
+            currentLike={currentLike?.liked}
           />
         );
       })}

@@ -8,15 +8,7 @@ export const GET = async (
   { params }: { params: { name: string } }
 ) => {
   try {
-    const prompt = await prisma.user.findUnique({
-      where: {
-        name: params.name,
-      },
-      select: prismaExclude("User", ["password", "role", "emailVerified"]),
-    });
-    if (!prompt) return new NextResponse("User Not Found", { status: 404 });
-
-    return new NextResponse(JSON.stringify(prompt), { status: 200 });
+    return new NextResponse();
   } catch (error) {
     return new NextResponse("Internal Server Error", { status: 500 });
   }

@@ -117,22 +117,22 @@ model Post {
 }
 
 model Comment {
-  id              String        @id @default(cuid())
-  photoId         String?       @map("photo_id")
-  postId          String?       @map("post_id")
-  userId          String        @map("user_id")
-  parentCommentId String?       @map("parent_comment_id")
-  content         String
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  CommentLike     CommentLike[]
-  parentComment   Comment?      @relation("ChildComments", fields: [parentCommentId], references: [id])
-  childComments   Comment[]     @relation("ChildComments")
-  photo           Photo?        @relation(fields: [photoId], references: [id])
-  post            Post?         @relation(fields: [postId], references: [id])
-  user            User          @relation(fields: [userId], references: [id])
+  id          String        @id @default(cuid())
+  photoId     String?       @map("photo_id")
+  postId      String?       @map("post_id")
+  userId      String        @map("user_id")
+  replyToId   String?       @map("reply_to_id")
+  content     String
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  CommentLike CommentLike[]
+  replyTo     Comment?      @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies     Comment[]     @relation("ReplyTo")
+  photo       Photo?        @relation(fields: [photoId], references: [id])
+  post        Post?         @relation(fields: [postId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
 
-  @@index([parentCommentId], map: "comments_parent_comment_id_fkey")
+  @@index([replyToId], map: "comments_parent_comment_id_fkey")
   @@index([photoId], map: "comments_photo_id_fkey")
   @@index([userId], map: "comments_user_id_fkey")
   @@map("comments")
@@ -143,6 +143,7 @@ model Like {
   photoId   String?  @map("photo_id")
   postId    String?  @map("post_id")
   userId    String   @map("user_id")
+  liked     Boolean
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   photo     Photo?   @relation(fields: [photoId], references: [id])
@@ -158,6 +159,7 @@ model CommentLike {
   id        String   @id @default(cuid())
   commentId String   @map("comment_id")
   userId    String   @map("user_id")
+  liked     Boolean
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   comment   Comment  @relation(fields: [commentId], references: [id])
@@ -183,6 +185,7 @@ model UserFollow {
   id             String   @id @default(cuid())
   followerId     String   @map("follower_id")
   followedUserId String   @map("followed_user_id")
+  followed       Boolean
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
   follower       User     @relation(fields: [followerId], references: [id])

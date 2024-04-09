@@ -16,6 +16,7 @@ const buttonVariants = cva(
         ghost:
           "bg-transparent hover:bg-zinc-100 text-zinc-800 data-[state=open]:bg-transparent data-[state=open]:bg-transparent",
         link: "bg-transparent dark:bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent",
+        none: "",
       },
       size: {
         default: "h-10 py-2 px-4",
@@ -24,12 +25,14 @@ const buttonVariants = cva(
         lg: "h-11 px-8",
         verySmall: "h-7 w-7",
         customXs: "h-8 px-2",
+        none: "",
       },
       rounded: {
         sm: "rounded-sm",
         md: "rounded-md",
         xl: "rounded-xl",
         full: "rounded-full",
+        none: "",
       },
     },
     defaultVariants: {
@@ -47,10 +50,13 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, children, variant, isLoading, size, ...props }, ref) => {
+  (
+    { className, children, variant, rounded, isLoading, size, ...props },
+    ref
+  ) => {
     return (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, rounded, className }))}
         ref={ref}
         disabled={isLoading}
         {...props}

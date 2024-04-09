@@ -17,11 +17,9 @@ const NotFound = () => {
           }}
         />
       </div>
-      <h1 className="leading-7 text-2xl font-bold m-0">
-        Sorry, page was not found
-      </h1>
+      <h1 className="leading-7 text-2xl font-bold m-0">Post was not found.</h1>
       <p className="my-4 text-sm text-[#576f76] font-semibold">
-        Please go back to home page
+        The post maybe has been deleted.
       </p>
       <Link
         aria-label="Edit profile avatar"

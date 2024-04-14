@@ -14,6 +14,7 @@ const GeneralFeed = async (props: Props) => {
       user: true,
       Comment: true,
       photos: true,
+      UserSaved: true,
     },
     take: INFINITE_SCROLLING_PAGINATION_RESULTS,
   });

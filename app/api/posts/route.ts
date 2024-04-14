@@ -26,6 +26,7 @@ export async function GET(req: Request) {
         user: true,
         Comment: true,
         photos: true,
+        UserSaved: true,
       },
     });
 

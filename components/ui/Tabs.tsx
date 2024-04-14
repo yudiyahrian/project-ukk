@@ -18,13 +18,6 @@ export const allTabs = [
     selfOnly: false,
   },
   {
-    id: "liked",
-    name: "Liked",
-    url: "liked",
-
-    selfOnly: true,
-  },
-  {
     id: "comments",
     name: "Comments",
     url: "comments",
@@ -32,16 +25,23 @@ export const allTabs = [
     selfOnly: false,
   },
   {
-    id: "saved",
-    name: "Saved",
-    url: "saved",
+    id: "albums",
+    name: "Albums",
+    url: "albums",
+
+    selfOnly: false,
+  },
+  {
+    id: "liked",
+    name: "Liked",
+    url: "liked",
 
     selfOnly: true,
   },
   {
-    id: "albums",
-    name: "Albums",
-    url: "albums",
+    id: "saved",
+    name: "Saved",
+    url: "saved",
 
     selfOnly: true,
   },

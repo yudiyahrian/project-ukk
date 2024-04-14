@@ -6,6 +6,7 @@ import { prisma } from "@utils/prisma";
 import { formatTimeToNow } from "@utils/utils";
 import { format } from "date-fns";
 import { Loader2, MessageSquare } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -54,20 +55,25 @@ const Page = async ({ params }: PageProps) => {
           <div className="flex flex-col col-span-2 space-y-6">
             <div className="h-full flex flex-col sm:flex-row items-center sm:items-start justify-between">
               <div className="sm:w-0 w-full flex-1 bg-white p-4 rounded-sm">
-                <p className="max-h-40 mt-1 truncate text-xs text-gray-500">
+                <Link
+                  href={`/user/${user && user.name}`}
+                  className="max-h-40 mt-1 truncate text-xs text-gray-500"
+                >
                   Posted by u/{user?.name}{" "}
                   {formatTimeToNow(new Date(post?.createdAt))}
-                </p>
-                <h1 className="text-xl font-semibold py-2 leading-6 text-gray-900">
+                </Link>
+                <h1 className="text-xl font-semibold pt-1 leading-6 text-gray-900">
                   {post?.title}
                 </h1>
 
                 {post.description && (
-                  <p className="text-zinc-500 text-sm">{post.description}</p>
+                  <p className="text-zinc-500 pt-2 text-sm">
+                    {post.description}
+                  </p>
                 )}
 
                 {post.photos.length !== 0 && (
-                  <div className="relative text-sm h-fit w-full">
+                  <div className="relative text-sm pt-2 h-fit w-full">
                     <PhotoCarousel photos={post.photos} />
                   </div>
                 )}
@@ -109,17 +115,28 @@ const Page = async ({ params }: PageProps) => {
           {/* INFO SIDEBAR */}
           <div className="hidden md:block overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">
             <div className="px-6 py-4">
-              <p className="font-semibold py-3">About You</p>
+              <p className="font-semibold py-3">About this post</p>
             </div>
 
             <dl className="divide-y divide-gray-100 px-6 py-4 text-sm leading-6 bg-white">
               <div className="flex justify-between gap-x-4 py-3">
                 <dt className="text-gray-500">Created at</dt>
                 <dd className="text-gray-700">
-                  {user && format(user.createdAt, "MMMM d, yyyy")}
+                  {post && format(post.createdAt, "MMMM d, yyyy")}
                 </dd>
               </div>
 
+              <div className="flex justify-between gap-x-4 py-3">
+                <dt className="text-gray-500">Created by</dt>
+                <dd className="text-gray-700">
+                  <Link
+                    href={`/user/${user && user.name}`}
+                    className="text-gray-900"
+                  >
+                    u/{user && user.name}
+                  </Link>
+                </dd>
+              </div>
               <div className="flex justify-between gap-x-4 py-3">
                 <dt className="text-gray-500">Follower</dt>
                 <dd className="text-gray-700">

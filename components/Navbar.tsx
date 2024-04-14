@@ -26,10 +26,15 @@ const Navbar = async (props: Props) => {
 
         {session?.user ? (
           <div className="flex gap-3">
-            <Button variant="subtle">
+            <Link
+              href={"/create"}
+              className={buttonVariants({
+                variant: "subtle",
+              })}
+            >
               <Plus className="mr-1 h-7" />
               Create
-            </Button>
+            </Link>
             <UserAccountNav user={session.user} />
           </div>
         ) : (

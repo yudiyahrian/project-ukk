@@ -61,6 +61,7 @@ const Editor: FC<EditorProps> = ({ userId }) => {
                   const res = await edgestore.myPublicImages.upload({
                     file,
                     input: { type: "post" },
+                    options: { temporary: true },
                   });
                   return {
                     success: 1,
@@ -144,25 +145,34 @@ const Editor: FC<EditorProps> = ({ userId }) => {
       });
     },
     onSuccess: () => {
-      // r/mycommunity/submit into r/mycommunity;
       router.push("/");
       router.refresh();
 
       return toast({
-        description: "Your post has been published.",
+        description: "Your post has been published, redirecting...",
       });
     },
   });
 
   async function onSubmit(data: PostCreationRequest) {
-    const blocks = await ref.current?.save();
+    const content = await ref.current?.save();
 
     const payload: PostCreationRequest = {
       title: data.title,
       description: data.description,
-      content: blocks,
+      content: content,
       userId,
     };
+
+    if (content && content?.blocks.length !== 0) {
+      for (const block of content.blocks) {
+        if (block.type === "image") {
+          await edgestore.myPublicImages.confirmUpload({
+            url: block.data.file.url,
+          });
+        }
+      }
+    }
 
     createPost(payload);
   }

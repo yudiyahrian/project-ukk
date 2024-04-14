@@ -8,6 +8,7 @@ import { cn } from "@/utils/utils";
 import { useMutation } from "@tanstack/react-query";
 import { PostLikeRequest } from "@/utils/validators/like";
 import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface PostLikeClientProps {
   postId: string;
@@ -24,6 +25,8 @@ const PostLikeClient: FC<PostLikeClientProps> = ({
   const [likesAmount, setLikesAmount] = useState<number>(initialLikesAmount);
   const [currentLike, setCurrentLike] = useState(initialLike);
   const prevLike = usePrevious(currentLike);
+
+  const router = useRouter();
 
   useEffect(() => {
     setCurrentLike(initialLike);
@@ -55,6 +58,8 @@ const PostLikeClient: FC<PostLikeClientProps> = ({
           });
         }
       }
+
+      router.refresh();
     },
     onMutate: (liked: boolean) => {
       // Update likes amount based on like/unlike operation

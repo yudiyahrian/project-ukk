@@ -23,12 +23,13 @@ model User {
   Album         Album[]
   CommentLike   CommentLike[]
   Comment       Comment[]
-  PhotoLike     Like[]
+  Like          Like[]
   Photo         Photo[]
   sessions      Session[]
   Post          Post[]
   Follower      UserFollow[]
   FollowedUser  UserFollow[]  @relation("FollowedUser")
+  UserSaved     UserSaved[]
 
   @@map("users")
 }
@@ -69,32 +70,38 @@ model Session {
 }
 
 model Album {
-  id        String   @id @default(cuid())
-  userId    String?  @map("user_id")
-  name      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  photos    Photo[]
+  id          String      @id @default(cuid())
+  userId      String?     @map("user_id")
+  name        String
+  description String?
+  privacy     Privacy     @default(public)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos      Photo[]
+  Post        Post[]
+  UserSaved   UserSaved[]
 
   @@index([userId], map: "albums_user_id_fkey")
   @@map("albums")
 }
 
 model Photo {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   photo     String
   caption   String?
-  userId    String?   @map("user_id")
-  albumId   String?   @map("album_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  userId    String?     @map("user_id")
+  albumId   String?     @map("album_id")
+  privacy   Privacy     @default(public)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
   Comment   Comment[]
   PhotoLike Like[]
-  album     Album?    @relation(fields: [albumId], references: [id])
-  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Post      Post?     @relation(fields: [postId], references: [id])
+  album     Album?      @relation(fields: [albumId], references: [id])
+  user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Post      Post?       @relation(fields: [postId], references: [id])
   postId    String?
+  UserSaved UserSaved[]
 
   @@index([albumId], map: "photos_album_id_fkey")
   @@index([userId], map: "photos_user_id_fkey")
@@ -102,16 +109,20 @@ model Photo {
 }
 
 model Post {
-  id          String    @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
   description String?
-  userId      String    @map("user_id")
+  userId      String      @map("user_id")
+  albumId     String?     @map("album_id")
+  privacy     Privacy     @default(public)
   photos      Photo[]
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   Like        Like[]
   Comment     Comment[]
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  album       Album?      @relation(fields: [albumId], references: [id])
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  UserSaved   UserSaved[]
 
   @@map("posts")
 }
@@ -197,7 +208,32 @@ model UserFollow {
   @@map("user_follows")
 }
 
+model UserSaved {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  postId    String?  @map("post_id")
+  photoId   String?  @map("photo_id")
+  albumId   String   @default("default_saved_image_album") @map("album_id")
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id])
+  photo     Photo?   @relation(fields: [photoId], references: [id])
+  album     Album    @relation(fields: [albumId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([photoId], map: "saved_photo_photo_id_fkey")
+  @@index([userId], map: "saved_photo_user_id_fkey")
+  @@index([postId], map: "saved_photo_post_id_fkey")
+  @@index([albumId], map: "saved_photo_album_id_fkey")
+  @@map("user_saved")
+}
+
 enum Role {
   user
   admin
+}
+
+enum Privacy {
+  public
+  private
 }

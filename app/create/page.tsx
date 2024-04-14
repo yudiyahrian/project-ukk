@@ -3,6 +3,7 @@ import { Button } from "@components/ui";
 import { getAuthSession } from "@utils/auth";
 import { prisma } from "@utils/prisma";
 import { format } from "date-fns";
+import { PlusIcon } from "lucide-react";
 import { Session } from "next-auth";
 
 const CreatePage = async () => {
@@ -30,7 +31,17 @@ const CreatePage = async () => {
           {/* INFO SIDEBAR */}
           <div className="hidden md:block overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">
             <div className="px-6 py-4">
-              <p className="font-semibold py-3">About You</p>
+              <p className="font-semibold py-3">
+                Posted by u/{user && user.name}
+              </p>
+              <Button
+                type="button"
+                size="xs"
+                className="text-center inline-flex items-center"
+              >
+                <PlusIcon className="w-3 h-3 text-white me-1" />
+                Album
+              </Button>
             </div>
 
             <dl className="divide-y divide-gray-100 px-6 py-4 text-sm leading-6 bg-white">

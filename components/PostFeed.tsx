@@ -62,6 +62,11 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts }) => {
         const currentLike = post.Like.find(
           (like) => like.userId === session?.user.id
         );
+        const savedExist = post.UserSaved.find(
+          (save) => save.userId === session?.user.id
+        );
+
+        const currentSaved = !!savedExist;
 
         if (index === posts.length - 1) {
           return (
@@ -71,6 +76,7 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts }) => {
                 likesAmount={likesAmount}
                 commentAmount={commentsAmount}
                 currentLike={currentLike?.liked}
+                currentSaved={currentSaved}
               />
             </li>
           );
@@ -83,6 +89,7 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts }) => {
             likesAmount={likesAmount}
             commentAmount={commentsAmount}
             currentLike={currentLike?.liked}
+            currentSaved={currentSaved}
           />
         );
       })}

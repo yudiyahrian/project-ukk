@@ -1,5 +1,6 @@
 import { prisma } from "@/utils/prisma";
 import { authOptions } from "@utils/auth";
+import { useEdgeStore } from "@utils/edgestore";
 import { PostValidator } from "@utils/validators/post";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
     // Step 2: Insert each photo associated with the post
 
     if (imageData.length !== 0) {
-      const photoPromises = imageData.map(async (photo) => {
+      for (const photo of imageData) {
         await prisma.photo.create({
           data: {
             photo: photo.url,
@@ -56,18 +57,8 @@ export async function POST(req: Request) {
             postId: createdPost.id, // Associate the photo with the created post
           },
         });
-      });
-
-      // Wait for all photo insertions to complete
-      await Promise.all(photoPromises);
+      }
     }
-
-    // await prisma.post.create({
-    //   data: {
-    //     title,
-    //     userId,
-    //   },
-    // });
 
     return new Response("OK");
   } catch (error) {

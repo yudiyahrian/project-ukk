@@ -11,3 +11,11 @@ export const PostValidator = z.object({
 });
 
 export type PostCreationRequest = z.infer<typeof PostValidator>;
+
+export const postSaveValidator = z.object({
+  postId: z.string().nullable().optional(),
+  photoId: z.string().nullable().optional(),
+  saved: z.boolean(),
+});
+
+export type PostSaveValidator = z.infer<typeof postSaveValidator>;

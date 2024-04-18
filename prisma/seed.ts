@@ -16,26 +16,26 @@ async function main() {
     },
   });
   const default_album_1 = await prisma.album.upsert({
-    where: { id: "default_profile_image_album" },
+    where: { id: "user-profile-image" },
     update: {},
     create: {
-      id: "default_profile_image_album",
+      id: "user-profile-image",
       name: "Profile Image",
     },
   });
   const default_album_2 = await prisma.album.upsert({
-    where: { id: "default_banner_image_album" },
+    where: { id: "user-banner-image" },
     update: {},
     create: {
-      id: "default_banner_image_album",
+      id: "user-banner-image",
       name: "Banner Image",
     },
   });
   const default_album_3 = await prisma.album.upsert({
-    where: { id: "default_saved_image_album" },
+    where: { id: "user-saved-image" },
     update: {},
     create: {
-      id: "default_saved_image_album",
+      id: "user-saved-image",
       name: "Saved Image",
     },
   });

@@ -17,32 +17,29 @@ export const allTabs = [
     url: "posts",
     selfOnly: false,
   },
-  {
-    id: "comments",
-    name: "Comments",
-    url: "comments",
-
-    selfOnly: false,
-  },
+  // next feature
+  // {
+  //   id: "comments",
+  //   name: "Comments",
+  //   url: "comments",
+  //   selfOnly: false,
+  // },
   {
     id: "albums",
     name: "Albums",
     url: "albums",
-
     selfOnly: false,
   },
   {
     id: "liked",
     name: "Liked",
     url: "liked",
-
     selfOnly: true,
   },
   {
     id: "saved",
     name: "Saved",
     url: "saved",
-
     selfOnly: true,
   },
 ];
@@ -76,8 +73,13 @@ export const Tabs: FC<TabsProps> = ({ tabs, isSelf, name }) => {
 
   useEffect(() => {
     const parts = pathname.split("/");
-    const url = parts[parts.length - 1];
-    const activeIndex = tabs.findIndex((tab) => tab.url === url);
+    let url;
+    if (parts.length === 5) {
+      url = parts[parts.length - 2];
+    } else {
+      url = parts[parts.length - 1];
+    }
+    const activeIndex = tabs.findIndex((tab) => tab.url.includes(url));
     if (activeTabIndex === null) {
       setActiveTabIndex(activeIndex !== -1 ? activeIndex : 0);
       return;
@@ -87,7 +89,9 @@ export const Tabs: FC<TabsProps> = ({ tabs, isSelf, name }) => {
     const activeTab = tabsRef.current[activeIndex !== -1 ? activeIndex : 0];
     if (
       activeTab &&
-      tabs[activeIndex !== -1 ? activeIndex : 0].name === activeTab.innerText
+      tabs[activeIndex !== -1 ? activeIndex : 0].name.includes(
+        activeTab.innerText
+      )
     ) {
       setTabPosition();
     } else {

@@ -1,9 +1,9 @@
 import Editor from "@components/Editor";
+import SelectAlbumButton from "@components/SelectAlbumButton";
 import { Button } from "@components/ui";
 import { getAuthSession } from "@utils/auth";
 import { prisma } from "@utils/prisma";
 import { format } from "date-fns";
-import { PlusIcon } from "lucide-react";
 import { Session } from "next-auth";
 
 const CreatePage = async () => {
@@ -15,6 +15,15 @@ const CreatePage = async () => {
     include: {
       Follower: true,
       Post: true,
+    },
+  });
+
+  const albums = await prisma.album.findMany({
+    where: {
+      userId: session!.user.id,
+    },
+    include: {
+      photos: true,
     },
   });
 
@@ -34,14 +43,7 @@ const CreatePage = async () => {
               <p className="font-semibold py-3">
                 Posted by u/{user && user.name}
               </p>
-              <Button
-                type="button"
-                size="xs"
-                className="text-center inline-flex items-center"
-              >
-                <PlusIcon className="w-3 h-3 text-white me-1" />
-                Album
-              </Button>
+              <SelectAlbumButton albums={albums} />
             </div>
 
             <dl className="divide-y divide-gray-100 px-6 py-4 text-sm leading-6 bg-white">
@@ -89,12 +91,6 @@ const Form = async ({ session }: { session: Session | null }) => {
 
       {/* FORM */}
       <Editor userId={session!.user.id!} />
-
-      <div className="w-full flex justify-end">
-        <Button type="submit" className="w-full" form="breadit-post-form">
-          Post
-        </Button>
-      </div>
     </div>
   ) : (
     <div>Loading...</div>

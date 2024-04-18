@@ -3,7 +3,6 @@ import Icons from "./Icons";
 import { buttonVariants } from "./ui";
 import { getAuthSession } from "@/utils/auth";
 import UserAccountNav from "./UserAccountNav";
-import { Button } from "./ui";
 import { Plus } from "lucide-react";
 
 type Props = {};

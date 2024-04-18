@@ -55,6 +55,11 @@ const PhotoCarousel: React.FC<PropType> = (props) => {
                   sizes="(min-width: 1415px) 750px, (min-width: 768px) 50vw, 100vw"
                   className="w-full h-[400px] object-contain relative"
                 />
+                {photo.caption && (
+                  <div className="photo-caption">
+                    <p className="text-white/80 text-sm">{photo.caption}</p>
+                  </div>
+                )}
               </div>
             </div>
           ))}

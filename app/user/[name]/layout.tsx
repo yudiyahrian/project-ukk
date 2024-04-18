@@ -132,22 +132,24 @@ export default async function Layout({
             </div>
           </div>
           <Tabs tabs={allTabs} isSelf={isSelf} name={params.name} />
-          {isSelf === true ? (
+          {isSelf === true && (
             <Link
               className={buttonVariants({
                 className: "mt-4 mb-2",
                 variant: "outline",
                 rounded: "full",
               })}
-              href="/"
+              href="/create"
             >
               <Plus className="mr-1 h-7" />
               Create Post
             </Link>
-          ) : (
-            <div className="flex h-8"></div>
           )}
-          <hr className="border-0 border-b-[.065rem] border-solid border-b-black/10" />
+          <hr
+            className={`border-0 border-b-[.065rem] border-solid border-b-black/10 ${
+              isSelf !== true && "mt-4"
+            }`}
+          />
           {children}{" "}
         </main>
         <div className="w-[316px] min-w-[316px] md:block styled-scrollbars md:sticky hidden md:top-[56px] md:max-h-[calc(100vh-54px-1px)] md:overflow-y-auto md:overflow-x-hidden">

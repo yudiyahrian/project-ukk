@@ -85,6 +85,25 @@
   transform: translateX(-50%);
   border-radius: 10px;
 }
+.photo-caption {
+  background-color: #00000099;
+  z-index: 3;
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  margin-bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
 .embla__dot {
   -webkit-tap-highlight-color: rgba(49, 49, 49, 0.5);
   -webkit-appearance: none;

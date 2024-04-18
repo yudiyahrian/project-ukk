@@ -35,6 +35,9 @@ const edgeStoreRouter = es.router({
         type: z.enum(["post", "profile"]),
       })
     )
+    .beforeDelete(({ ctx, fileInfo }) => {
+      return true; // allow delete
+    })
     // e.g. /post/my-file.jpg
     .path(({ input }) => [{ type: input.type }]),
 

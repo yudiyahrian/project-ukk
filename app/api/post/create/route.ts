@@ -1,19 +1,27 @@
 import { prisma } from "@/utils/prisma";
-import { authOptions } from "@utils/auth";
-import { useEdgeStore } from "@utils/edgestore";
+import { getAuthSession } from "@utils/auth";
 import { PostValidator } from "@utils/validators/post";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 export async function POST(req: Request) {
+  const url = new URL(req.url);
+
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session?.user) {
       return new Response("Unauthorized", {
         status: 401,
       });
     }
+
+    const { album } = z
+      .object({
+        album: z.string().nullable().optional(),
+      })
+      .parse({
+        album: url.searchParams.get("album"),
+      });
 
     const body = await req.json();
 
@@ -36,27 +44,49 @@ export async function POST(req: Request) {
       }
     });
 
-    // Step 1: Insert the post into the database
-    const createdPost = await prisma.post.create({
-      data: {
-        title,
-        description,
-        userId,
-      },
-    });
+    if (album) {
+      const createdPost = await prisma.post.create({
+        data: {
+          title,
+          description,
+          albumId: album,
+          userId,
+        },
+      });
 
-    // Step 2: Insert each photo associated with the post
+      if (imageData.length !== 0) {
+        for (const photo of imageData) {
+          await prisma.photo.create({
+            data: {
+              photo: photo.url,
+              caption: photo.caption,
+              userId: userId,
+              albumId: album,
+              postId: createdPost.id, // Associate the photo with the created post
+            },
+          });
+        }
+      }
+    } else {
+      const createdPost = await prisma.post.create({
+        data: {
+          title,
+          description,
+          userId,
+        },
+      });
 
-    if (imageData.length !== 0) {
-      for (const photo of imageData) {
-        await prisma.photo.create({
-          data: {
-            photo: photo.url,
-            caption: photo.caption,
-            userId: userId,
-            postId: createdPost.id, // Associate the photo with the created post
-          },
-        });
+      if (imageData.length !== 0) {
+        for (const photo of imageData) {
+          await prisma.photo.create({
+            data: {
+              photo: photo.url,
+              caption: photo.caption,
+              userId: userId,
+              postId: createdPost.id, // Associate the photo with the created post
+            },
+          });
+        }
       }
     }
 

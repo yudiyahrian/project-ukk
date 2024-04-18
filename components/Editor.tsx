@@ -9,7 +9,8 @@ import type EditorJS from "@editorjs/editorjs";
 import { useEdgeStore } from "@/utils/edgestore";
 import { toast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "./ui";
 
 interface EditorProps {
   userId: string;
@@ -32,9 +33,11 @@ const Editor: FC<EditorProps> = ({ userId }) => {
 
   const ref = useRef<EditorJS>();
   const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const _titleRef = useRef<HTMLTextAreaElement>(null);
   const _descriptionRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { edgestore } = useEdgeStore();
 
   const initializeEditor = useCallback(async () => {
@@ -122,19 +125,25 @@ const Editor: FC<EditorProps> = ({ userId }) => {
       userId,
       description,
     }: PostCreationRequest) => {
+      setIsLoading(true);
       const payload: PostCreationRequest = {
         userId,
         title,
         description,
         content,
       };
-      const res = await fetch("/api/post/create", {
+      const album = searchParams.get("album");
+      var path = "/api/post/create";
+      if (album) path += `?album=${album}`;
+      const res = await fetch(path, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
+      setIsLoading(false);
+
       return res;
     },
     onError: () => {
@@ -185,40 +194,52 @@ const Editor: FC<EditorProps> = ({ userId }) => {
   const { ref: descriptionRef, ...props } = register("description");
 
   return (
-    <div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
-      <TextareaAutosize
-        ref={(e) => {
-          titleRef(e);
-
-          // @ts-ignore
-          _titleRef.current = e;
-        }}
-        {...rest}
-        placeholder="Title"
-        className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
-      />
-      <hr className="border-0 border-b-[.065rem] border-solid border-b-black/10 mb-3" />
-      <form
-        id="breadit-post-form"
-        className="w-full"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+    <>
+      <div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
         <TextareaAutosize
           ref={(e) => {
-            descriptionRef(e);
+            titleRef(e);
 
             // @ts-ignore
-            _descriptionRef.current = e;
+            _titleRef.current = e;
           }}
-          {...props}
-          placeholder="Description"
-          className="w-full resize-none appearance-none overflow-hidden bg-transparent text-base focus:outline-none"
+          {...rest}
+          placeholder="Title"
+          className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
         />
-        <div className="prose prose-stone dark:prose-invert w-1/2">
-          <div id="editor" />
-        </div>
-      </form>
-    </div>
+        <hr className="border-0 border-b-[.065rem] border-solid border-b-black/10 mb-3" />
+        <form
+          id="breadit-post-form"
+          className="w-full"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <TextareaAutosize
+            ref={(e) => {
+              descriptionRef(e);
+
+              // @ts-ignore
+              _descriptionRef.current = e;
+            }}
+            {...props}
+            placeholder="Description"
+            className="w-full resize-none appearance-none overflow-hidden bg-transparent text-base focus:outline-none"
+          />
+          <div className="prose prose-stone dark:prose-invert w-1/2">
+            <div id="editor" />
+          </div>
+        </form>
+      </div>
+      <div className="w-full flex justify-end">
+        <Button
+          isLoading={isLoading}
+          type="submit"
+          className="w-full"
+          form="breadit-post-form"
+        >
+          Post
+        </Button>
+      </div>
+    </>
   );
 };
 

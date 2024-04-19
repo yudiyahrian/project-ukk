@@ -1,25 +1,83 @@
+"use client"
+
 import PhotoProfile from "./upload";
 import ProfileForm from "./form";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { useEdgeStore } from "@utils/edgestore";
 
-export default async function Profile() {
+export interface formValues {
+  name: string;
+  description: string;
+  image: string | File;
+  bannerImage: string | File;
+}
+
+export default function Profile() {
+  const { data: session, update: UpdateSession } = useSession();
+  const user = session?.user;
+  const { edgestore } = useEdgeStore();
+
+  const [formValues, setFormValues] = useState<formValues>({
+    name: user?.name ?? '',
+    description: '',
+    image: "",
+    bannerImage: "",
+  });
+
+  const onChange = (value: string, name: string) => {
+    return setFormValues({ ...formValues, [name]: value })
+  }
+
+  const saveChanges = async () => {
+    await edgestore.myPublicImages.confirmUpload({
+      url: formValues.image as string,
+    });
+
+    await edgestore.myPublicImages.confirmUpload({
+      url: formValues.bannerImage as string
+    });
+
+    await fetch("/api/profile", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: user?.id,
+        image: formValues.image,
+        name: formValues.name,
+        // banner: formValues.bannerImage
+        // description: formValues.description
+      })
+    })
+      .then((response) => {
+        UpdateSession({
+          name: formValues.name,
+          image: formValues.image,
+          // description: formValues.description,
+          // banner: formValues.bannerImage
+        })
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+  }
+
+  const disabled =
+    formValues.name === user?.name &&
+    formValues.image === "" &&
+    formValues.bannerImage === "" &&
+    formValues.description === '';
+
   return (
-    <>
-      <section className="bg-ct-blue-600  min-h-screen pt-20">
-        <div className="max-w-4xl mx-auto bg-ct-dark-100 rounded-md h-[20rem] flex justify-center items-center">
-          <div>
-            <p className="mb-3 text-5xl text-center font-semibold">
-              Profile Page
-            </p>
-            <div className="flex items-center gap-8">
-              <PhotoProfile />
+    <div className="flex flex-col gap-7 w-4/5 pb-4">
+      <p className="text-2xl font-bold text-black">User Setting</p>
+      <ProfileForm formValues={formValues} onChange={onChange} />
 
-              <div className="mt-8">
-                <ProfileForm />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+      <PhotoProfile formValues={formValues} onChange={onChange} />
+
+      <button disabled={disabled} onClick={saveChanges} className="self-end px-12 py-2.5 rounded-md font-semibold text-sm bg-black text-[#f4f4f5] opacity-80 hover:opacity-100 transition-all disabled:opacity-35 disabled:cursor-default">Save</button>
+    </div>
   );
 }

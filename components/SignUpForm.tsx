@@ -161,7 +161,7 @@ export default function SignUpForm() {
         type="submit"
         className="w-full mb-2"
       >
-        {isLoading ? null : <h4>Sign In</h4>}
+        {isLoading ? null : <h4>Sign Up</h4>}
       </Button>
     </form>
   );

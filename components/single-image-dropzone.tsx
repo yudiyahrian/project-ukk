@@ -1,6 +1,6 @@
 "use client";
 
-import {X } from "lucide-react";
+import { X } from "lucide-react";
 import * as React from "react";
 import { DropzoneOptions, useDropzone } from "react-dropzone";
 import { twMerge } from "tailwind-merge";
@@ -15,7 +15,7 @@ const variants = {
   reject: "border border-red-700 bg-red-700 bg-opacity-10",
 };
 
-type InputProps = {
+export type DropzoneProps = {
   width: number;
   height: number;
   className?: string;
@@ -41,7 +41,7 @@ const ERROR_MESSAGES = {
   },
 };
 
-const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
+const SingleImageDropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
   (
     {
       dropzoneOptions,

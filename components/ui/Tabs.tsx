@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { FC, useEffect, useRef, useState } from "react";
 
 export const allTabs = [
+  // next feature
   {
     id: "overview",
     name: "Overview",

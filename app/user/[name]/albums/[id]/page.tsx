@@ -12,17 +12,21 @@ type Props = {
 const AlbumDetail = async (props: Props) => {
   const formattedUrl = decodeURIComponent(props.params.name);
   const session = await getAuthSession();
+  const userData = await prisma.user.findUnique({
+    where: {
+      name: formattedUrl,
+    },
+  });
   const albumData = await prisma.album.findUnique({
     where: {
       id: props.params.id,
     },
     include: {
-      photos: true,
-    },
-  });
-  const userData = await prisma.user.findUnique({
-    where: {
-      name: formattedUrl,
+      photos: {
+        where: {
+          userId: userData?.id,
+        },
+      },
     },
   });
 
@@ -34,7 +38,12 @@ const AlbumDetail = async (props: Props) => {
         <div className="flex flex-wrap gap-5 mt-5">
           {isSelf && (
             <Link
-              href={`/create?album=${props.params.id}`}
+              href={
+                albumData.id !== "user-profile-image" &&
+                albumData.id !== "user-banner-image"
+                  ? `/create?album=${props.params.id}`
+                  : "/settings"
+              }
               className="h-36 w-36 bg-[#dfe1e9] flex flex-col justify-center items-center rounded-md border border-black/10"
             >
               <Plus />

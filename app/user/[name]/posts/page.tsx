@@ -1,6 +1,5 @@
 import { Empty } from "@components/user/Empty";
 import { prisma } from "@/utils/prisma";
-import PostFeed from "@components/PostFeed";
 import PostComponentClient from "@components/user/UserComponentClient";
 
 type Props = {

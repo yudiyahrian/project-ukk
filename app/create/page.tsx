@@ -1,6 +1,5 @@
 import Editor from "@components/Editor";
 import SelectAlbumButton from "@components/SelectAlbumButton";
-import { Button } from "@components/ui";
 import { getAuthSession } from "@utils/auth";
 import { prisma } from "@utils/prisma";
 import { format } from "date-fns";
@@ -13,8 +12,13 @@ const CreatePage = async () => {
       email: session!.user.email!,
     },
     include: {
-      Follower: true,
       Post: true,
+    },
+  });
+
+  const followersCount = await prisma.userFollow.count({
+    where: {
+      followedUserId: session!.user.id,
     },
   });
 
@@ -55,20 +59,18 @@ const CreatePage = async () => {
               </div>
 
               <div className="flex justify-between gap-x-4 py-3">
-                <dt className="text-gray-500">Follower</dt>
-                <dd className="text-gray-700">
-                  <div className="text-gray-900">
-                    {user && user.Follower.length}
-                  </div>
-                </dd>
+                <div className="text-gray-500">Follower</div>
+                <div className="text-gray-700">
+                  <div className="text-gray-900">{user && followersCount}</div>
+                </div>
               </div>
               <div className="flex justify-between gap-x-4 py-3">
-                <dt className="text-gray-500">Post you created</dt>
-                <dd className="text-gray-700">
+                <div className="text-gray-500">Post you created</div>
+                <div className="text-gray-700">
                   <div className="text-gray-900">
                     {user && user.Post.length}
                   </div>
-                </dd>
+                </div>
               </div>
             </dl>
           </div>

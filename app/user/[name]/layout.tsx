@@ -101,7 +101,7 @@ export default async function Layout({
                       rounded: "full",
                       variant: "subtle",
                     })}
-                    href=""
+                    href="/settings"
                   >
                     <span className="flex items-center justify-center">
                       <span className="flex">
@@ -161,7 +161,7 @@ export default async function Layout({
                 width={0}
                 height={0}
                 sizes="100vw"
-                className="w-full h-[114px] absolute z-10"
+                className="w-full h-[114px] absolute z-10 rounded-t-[1rem] object-cover"
               />
             )}
             <div
@@ -189,7 +189,7 @@ export default async function Layout({
                       rounded: "full",
                       variant: "subtle",
                     })}
-                    href="/"
+                    href="/settings"
                   >
                     <span className="flex items-center justify-center">
                       <span className="flex">
@@ -263,7 +263,7 @@ export default async function Layout({
                     Settings
                   </h2>
                   <ul className="pl-0 my-0">
-                    <li className="relative list-none mt-0 -mx-4 pointer-events-none">
+                    <li className="relative list-none mt-0 -mx-4">
                       <div className="flex justify-between relative px-4 gap-[0.5rem] text-[#0F1A1C] py-2 pr-4 -outline-offset-1">
                         <span className="flex items-center gap-2 min-w-0 shrink">
                           <span className="flex shrink-0 items-center justify-center">
@@ -282,19 +282,18 @@ export default async function Layout({
                             </span>
                           </span>
                         </span>
-                        <span className="flex items-center shrink-0">
-                          <Link
-                            className={buttonVariants({
-                              className: "text-xs px-2",
-                              variant: "outline",
-                              rounded: "full",
-                              size: "customXs",
-                            })}
-                            href="/"
-                          >
-                            Edit Profile
-                          </Link>
-                        </span>
+                        <Link
+                          className={buttonVariants({
+                            className:
+                              "text-xs px-2 flex items-center shrink-0",
+                            variant: "outline",
+                            rounded: "full",
+                            size: "customXs",
+                          })}
+                          href="/settings"
+                        >
+                          Edit Profile
+                        </Link>
                       </div>
                     </li>
                   </ul>

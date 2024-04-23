@@ -40,9 +40,20 @@ const Page = async ({ params }: PageProps) => {
     },
   });
 
-  const comments = await prisma.comment.count({
+  const comments = await prisma.comment.findMany({
     where: {
       postId: post.id,
+      replyToId: undefined,
+    },
+    include: {
+      user: true,
+      CommentLike: true,
+      replies: {
+        include: {
+          user: true,
+          CommentLike: true,
+        },
+      },
     },
   });
 
@@ -97,7 +108,7 @@ const Page = async ({ params }: PageProps) => {
                   <p className="text-opacity-70 text-black">&#x2022;</p>
                   <span className="w-fit flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
-                    {comments} comments
+                    {comments.length} comments
                   </span>
                 </div>
 
@@ -106,7 +117,7 @@ const Page = async ({ params }: PageProps) => {
                     <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
                   }
                 >
-                  <CommentsSection postId={post?.id} />
+                  <CommentsSection postId={post.id} comments={comments} />
                 </Suspense>
               </div>
             </div>

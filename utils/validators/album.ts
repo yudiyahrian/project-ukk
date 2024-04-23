@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createAlbumValidator = z.object({
   name: z
     .string()
-    .min(3, { message: "Album name must be longer than 3 characters" }),
+    .min(1, { message: "Album name must be longer than 1 characters" }),
   description: z.string().nullable(),
   id: z.string().optional(),
 });

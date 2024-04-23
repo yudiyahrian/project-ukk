@@ -38,6 +38,9 @@ const Albums = async (props: Props) => {
         orderBy: {
           createdAt: "desc",
         },
+        where: {
+          userId: userData?.id,
+        },
       },
     },
   });
@@ -50,6 +53,9 @@ const Albums = async (props: Props) => {
       photos: {
         orderBy: {
           createdAt: "desc",
+        },
+        where: {
+          userId: userData?.id,
         },
       },
     },

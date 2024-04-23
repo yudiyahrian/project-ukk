@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          description: user.description,
           image: user.image,
           bannerImage: user.bannerImage,
           randomKey: "Hey cool",
@@ -68,17 +69,19 @@ export const authOptions: NextAuthOptions = {
           image: token.picture,
           bannerImage: token.bannerImage,
           id: token.id,
+          description: token.description,
           randomKey: token.randomKey,
           role: token.role,
         },
       };
     },
     jwt: ({ token, user, trigger, session }) => {
-      if (trigger === "update" && session?.image) {
-        token.picture = session.image;
-      }
-      if (trigger === "update" && session?.name) {
-        token.name = session.name;
+      if (trigger === "update") {
+        if (session.image) token.picture = session.image;
+        if (session.name) token.name = session.name;
+        if (session.description !== null)
+          token.description = session.description;
+        if (session.bannerImage) token.bannerImage = session.bannerImage;
       }
       if (user) {
         const u = user as unknown as any;
@@ -88,6 +91,7 @@ export const authOptions: NextAuthOptions = {
           picture: u.image,
           bannerImage: u.bannerImage,
           randomKey: u.randomKey,
+          description: u.description,
           role: u.role,
         };
       }

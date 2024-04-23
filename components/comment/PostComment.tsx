@@ -139,6 +139,7 @@ const PostComment: FC<PostCommentProps> = ({
                       content: input,
                       replyToId: comment.replyToId ?? comment.id,
                     });
+                    setInput("");
                   }}
                 >
                   Post

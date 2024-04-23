@@ -228,6 +228,22 @@ model UserSaved {
   @@map("user_saved")
 }
 
+model UserLog {
+  id              String   @id @default(uuid())
+  old_name        String   @unique
+  new_name        String   @unique
+  email           String?  @unique
+  old_description String?
+  new_description String?
+  old_image       String?
+  new_image       String?
+  old_bannerImage String?
+  new_bannerImage String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("user_logs")
+}
+
 enum Role {
   user
   admin

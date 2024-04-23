@@ -6,6 +6,7 @@ import {
   Photo,
   UserSaved,
   Album,
+  CommentLike,
 } from "@prisma/client";
 
 export type ExtendedPost = Post & {
@@ -18,4 +19,12 @@ export type ExtendedPost = Post & {
 
 export type ExtendedAlbum = Album & {
   photos: Photo[];
+};
+
+export type CommentBase = Comment & {
+  user: User;
+  CommentLike: CommentLike[];
+};
+export type ExtendedComment = CommentBase & {
+  replies: CommentBase[];
 };
